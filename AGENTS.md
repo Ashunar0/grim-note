@@ -1,5 +1,12 @@
 # プロジェクト上の留意点
 
+- ここまでの進捗まとめ:
+  - Issue #1: Rails スキーマ/モデル/フィクスチャ整備、リクエストテスト基盤構築 (feat: bootstrap relational schema)
+  - Issue #2: セッション認証 API 実装、PasswordDigest フォールバック、認証リクエストテスト追加 (feat: implement session auth api / fix: harden session auth behavior)
+  - Issue #3: 投稿タイムライン/詳細 API 実装、ページネーション/likes_count 対応、リクエストテスト追加 (feat: add posts timeline api)
+  - Issue #4: フロント認証フロー・Auth コンテキスト・API クライアント実装、保護ルート導線整備 (feat: wire next auth flow)
+  - テスト: `bin/rails test`, `npm run lint`, `npm run typecheck` 等で主要フロー確認済み
+
 - 回答は日本語で簡潔かつ明確に出力すること。
 - UI は明示的な指示がない限り変更しないこと。変更の必要がある場合は許可を取ること。
 - 実装中に生じたエラーや疑問点は、docs/配下に md ファイルとして記述・保存しておくこと。

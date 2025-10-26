@@ -9,9 +9,11 @@ import { Label } from "@/components/ui/label";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import { apiClient } from "@/lib/api-client";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const { refresh } = useAuth();
   const [error, setError] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -30,6 +32,7 @@ export default function LoginPage() {
     setIsSubmitting(true);
     try {
       await apiClient.post('/login', { email, password });
+      await refresh();
       router.push('/timeline');
       router.refresh();
     } catch (err: any) {
