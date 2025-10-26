@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { BookOpen, Search, User, Plus, LogOut } from "lucide-react";
+import { useAuth } from '@/hooks/use-auth';
 import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
@@ -10,9 +11,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { apiClient } from '@/lib/api-client';
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
 export default function Header() {
+  const { user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
       <div className="container mx-auto flex h-16 max-w-3xl items-center justify-between px-4">
@@ -37,16 +45,16 @@ export default function Header() {
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="rounded-full">
                 <Avatar className="h-8 w-8">
-                  <AvatarImage src="" alt="User" />
+                  <AvatarImage src="" alt={user?.name ?? 'User'} />
                   <AvatarFallback>
-                    <User className="h-4 w-4" />
+                    {(user?.name?.[0] ?? 'U').toUpperCase()}
                   </AvatarFallback>
                 </Avatar>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-48">
               <DropdownMenuItem asChild>
-                <Link href="/users/1" className="cursor-pointer">
+                <Link href={user ? `/users/${user.id}` : '/login'} className="cursor-pointer">
                   <User className="mr-2 h-4 w-4" />
                   マイページ
                 </Link>
@@ -58,11 +66,9 @@ export default function Header() {
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem asChild>
-                <Link href="/login" className="cursor-pointer">
-                  <LogOut className="mr-2 h-4 w-4" />
-                  ログアウト
-                </Link>
+              <DropdownMenuItem onSelect={(event) => { event.preventDefault(); handleLogout(); }} className="cursor-pointer">
+                <LogOut className="mr-2 h-4 w-4" />
+                ログアウト
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
