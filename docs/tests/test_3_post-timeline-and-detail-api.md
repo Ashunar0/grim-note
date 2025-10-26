@@ -72,9 +72,9 @@ curl -s http://localhost:3000/api/v1/posts | jq '.data[0]'
 
 ## 検証結果（記録用）
 
-| 実施日     | 担当 | 結果 | メモ |
-| ---------- | ---- | ---- | ---- |
-| YYYY/MM/DD |      | ✅/❌ |      |
+| 実施日     | 担当      | 結果 | メモ |
+| ---------- | --------- | ---- | ---- |
+| 2025/10/26 | a.kawanobe | ✅   | `bundle exec rails test test/requests/api/v1/posts_test.rb` を実行し一覧/詳細/ページネーションの検証を完了 |
 
 ## 要確認事項（未確定・オープン）
 
