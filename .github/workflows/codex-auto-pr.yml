@@ -1,0 +1,66 @@
+# Codexの設定: issue完了時に自動でPRを生成する
+name: "Grim Issue Auto PR"
+
+description: >
+  GitHubの各issueが完了したら、自動的にブランチを作成し、
+  コミット＆プルリクエストを生成してmainにマージ準備を行う。
+
+# 実行タイミング
+on:
+  issue_comment:
+    types: [created]
+
+jobs:
+  create_pr:
+    if: contains(github.event.comment.body, '/done') || contains(github.event.comment.body, '完了')
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Get issue info
+        id: issue
+        run: |
+          echo "title=$(jq -r '.issue.title' $GITHUB_EVENT_PATH)" >> $GITHUB_OUTPUT
+          echo "number=$(jq -r '.issue.number' $GITHUB_EVENT_PATH)" >> $GITHUB_OUTPUT
+          echo "body=$(jq -r '.issue.body' $GITHUB_EVENT_PATH)" >> $GITHUB_OUTPUT
+
+      - name: Create branch
+        run: |
+          BRANCH_NAME=feature/issue-${{ steps.issue.outputs.number }}
+          git checkout -b $BRANCH_NAME
+
+      - name: Commit changes
+        run: |
+          git config user.name "Codex Bot"
+          git config user.email "codex-bot@example.com"
+          git add .
+          git commit -m "feat: 完了したIssue #${{ steps.issue.outputs.number }} - ${{ steps.issue.outputs.title }}" || echo "No changes to commit"
+
+      - name: Push branch
+        run: |
+          git push origin HEAD
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          title: "🧩 Issue #${{ steps.issue.outputs.number }} - ${{ steps.issue.outputs.title }}"
+          body: |
+            ### Issue内容
+            ${{ steps.issue.outputs.body }}
+
+            ### 自動生成メモ
+            - このPRはCodexにより自動生成されました。
+            - 完了コメント: `${{ github.event.comment.body }}`
+          branch: feature/issue-${{ steps.issue.outputs.number }}
+          base: main
