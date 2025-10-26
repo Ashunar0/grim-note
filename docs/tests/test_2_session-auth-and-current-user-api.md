@@ -79,9 +79,9 @@ curl -i -c tmp/cookies -X POST http://localhost:3000/api/v1/login \
 
 ## 検証結果（記録用）
 
-| 実施日     | 担当 | 結果 | メモ |
-| ---------- | ---- | ---- | ---- |
-| YYYY/MM/DD |      | ✅/❌ |      |
+| 実施日     | 担当      | 結果 | メモ |
+| ---------- | --------- | ---- | ---- |
+| 2025/10/26 | a.kawanobe | ✅   | `/Users/a.kawanobe/.local/share/gem/ruby/3.1.0/bin/bundle _2.3.27_ exec rails test test/requests/api/v1/authentication_test.rb` を実行し全テスト成功 |
 
 ## 要確認事項（未確定・オープン）
 
