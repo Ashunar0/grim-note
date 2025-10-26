@@ -9,4 +9,8 @@ class Post < ApplicationRecord
 
   validates :body, presence: true, length: { maximum: 500 }
   validates :rating, presence: true, inclusion: { in: 1..5 }
+
+  def likes_count
+    (self[:likes_count] || likes.size).to_i
+  end
 end
