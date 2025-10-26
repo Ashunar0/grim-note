@@ -3,9 +3,9 @@ alice:
   bio: Lover of contemporary fiction.
   icon_url: https://example.com/alice.png
   email: alice@example.com
-  password_digest: password_digest
+  password_digest: 616b025a37273f3728c49857857f164d$$a0c21a35617552eb280bdecbc5a87367413ae70cc23c2b31cd06688e945da82b
 
 bob:
   name: Bob Writer
   email: bob@example.com
-  password_digest: password_digest
+  password_digest: 68cfd1e6caf7bff4463218f3c5084683$$8493ffa55a23948a08f7288e0de12570a4d526e50ce198a118a70a2adfa33565

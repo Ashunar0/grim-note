@@ -12,12 +12,12 @@ docs/01_requirements.md と docs/04_api.md で定義されたメール＋パス�
 - `docs/04_api.md` の例外を参考に、エラーレスポンス整形ロジックを共通化
 
 ### ゴール / 完了条件（Acceptance Criteria）
-- [ ] POST `/api/v1/users` が登録と同時にログインセッションを開始し、重複メール時は `VALIDATION_ERROR` を返す
-- [ ] POST `/api/v1/login` がパスワードを検証し、失敗時に `UNAUTHORIZED` を返却する
-- [ ] DELETE `/api/v1/logout` でセッション Cookie が削除される
-- [ ] GET `/api/v1/me` が現在ユーザー情報を返し、未ログイン時は `UNAUTHORIZED` を返す
-- [ ] 登録・ログイン・ログアウト・me のリクエストテストが追加される
+- [x] POST `/api/v1/users` が登録と同時にログインセッションを開始し、重複メール時は `VALIDATION_ERROR` を返す
+- [x] POST `/api/v1/login` がパスワードを検証し、失敗時に `UNAUTHORIZED` を返却する
+- [x] DELETE `/api/v1/logout` でセッション Cookie が削除される
+- [x] GET `/api/v1/me` が現在ユーザー情報を返し、未ログイン時は `UNAUTHORIZED` を返す
+- [x] 登録・ログイン・ログアウト・me のリクエストテストが追加される
 
 ### テスト観点
 - リクエスト
-- 検証方法: `bin/rails test TEST=test/requests/api/v1/sessions_test.rb` などでリクエストテストを実行し、Cookie の有効性とエラーハンドリングを確認
+- 検証方法: `bin/rails test TEST=test/requests/api/v1/authentication_test.rb` などでリクエストテストを実行し、Cookie の有効性とエラーハンドリングを確認
