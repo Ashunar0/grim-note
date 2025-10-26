@@ -1,0 +1,13 @@
+alice_post:
+  user: alice
+  book: norwegian_wood
+  body: A thoughtful reflection on themes of memory and loss.
+  rating: 5
+  read_at: 2024-01-12
+
+bob_post:
+  user: bob
+  book: the_song_of_achilles
+  body: A sweeping retelling full of emotion.
+  rating: 4
+  read_at: 2024-02-28

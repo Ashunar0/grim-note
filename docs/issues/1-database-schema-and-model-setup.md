@@ -11,10 +11,10 @@ docs/03_database.md で定義されたスキーマを実際のテーブルとモ
 - `bin/rails db:migrate` および `bin/rails db:test:prepare` の確認とドキュメント更新（必要時）
 
 ### ゴール / 完了条件（Acceptance Criteria）
-- [ ] users・books・posts・tags・post_tags・likes・follows テーブルを定義し、必須制約とインデックスを付与する
-- [ ] 各モデルに関連付けと基本バリデーション（例: Post 本文 500 文字制限）を実装する
-- [ ] `bin/rails db:migrate` と `bin/rails db:test:prepare` が通る
-- [ ] 更新された `schema.rb` とモデルがレビュー可能な状態で提示される
+- [x] users・books・posts・tags・post_tags・likes・follows テーブルを定義し、必須制約とインデックスを付与する
+- [x] 各モデルに関連付けと基本バリデーション（例: Post 本文 500 文字制限）を実装する
+- [x] `bin/rails db:migrate` と `bin/rails db:test:prepare` が通る
+- [x] 更新された `schema.rb` とモデルがレビュー可能な状態で提示される
 
 ### テスト観点
 - ユニット（モデル）

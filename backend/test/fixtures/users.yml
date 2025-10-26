@@ -1,0 +1,11 @@
+alice:
+  name: Alice Reader
+  bio: Lover of contemporary fiction.
+  icon_url: https://example.com/alice.png
+  email: alice@example.com
+  password_digest: password_digest
+
+bob:
+  name: Bob Writer
+  email: bob@example.com
+  password_digest: password_digest

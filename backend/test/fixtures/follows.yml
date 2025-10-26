@@ -1,0 +1,7 @@
+alice_follows_bob:
+  follower: alice
+  followee: bob
+
+bob_follows_alice:
+  follower: bob
+  followee: alice

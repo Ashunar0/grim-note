@@ -1,0 +1,7 @@
+alice_post_literature:
+  post: alice_post
+  tag: literature
+
+bob_post_mythology:
+  post: bob_post
+  tag: mythology
