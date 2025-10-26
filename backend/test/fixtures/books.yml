@@ -1,0 +1,13 @@
+norwegian_wood:
+  google_books_id: "gb-123"
+  title: Norwegian Wood
+  authors: Haruki Murakami
+  isbn13: "9784062748704"
+  published_year: 1987
+
+the_song_of_achilles:
+  google_books_id: "gb-456"
+  title: The Song of Achilles
+  authors: Madeline Miller
+  isbn13: "9780062060624"
+  published_year: 2011

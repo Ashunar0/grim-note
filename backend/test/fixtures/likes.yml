@@ -1,0 +1,7 @@
+alice_likes_bob_post:
+  user: alice
+  post: bob_post
+
+bob_likes_alice_post:
+  user: bob
+  post: alice_post
