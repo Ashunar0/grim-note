@@ -7,6 +7,7 @@ module Api
         user.password = attributes["password"]
 
         if user.save
+          reset_session
           session[:user_id] = user.id
           render_success(
             data: {

@@ -6,6 +6,7 @@ module Api
         user = User.find_by(email: credentials[:email]&.downcase)
 
         if user&.authenticate(credentials[:password])
+          reset_session
           session[:user_id] = user.id
           render_success(
             data: {

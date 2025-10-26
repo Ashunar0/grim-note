@@ -23,7 +23,11 @@ module PasswordDigest
     return false if salt.blank? || digest.blank?
 
     candidate = Digest::SHA256.hexdigest("#{salt}#{password}")
+    return false unless digest.bytesize == candidate.bytesize
+
     ActiveSupport::SecurityUtils.secure_compare(candidate, digest)
+  rescue ArgumentError
+    false
   end
 
   class PasswordToken
