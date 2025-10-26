@@ -19,7 +19,10 @@ module PasswordDigest
   def valid?(stored_digest, password)
     return false if stored_digest.blank? || password.blank?
 
-    salt, digest = stored_digest.split(SEPARATOR, 2)
+    parts = stored_digest.split(SEPARATOR, 2)
+    return false unless parts.length == 2
+
+    salt, digest = parts
     return false if salt.blank? || digest.blank?
 
     candidate = Digest::SHA256.hexdigest("#{salt}#{password}")

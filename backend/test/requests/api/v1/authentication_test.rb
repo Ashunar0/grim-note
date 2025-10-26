@@ -90,4 +90,29 @@ class Api::V1::AuthenticationTest < ActionDispatch::IntegrationTest
     json = response.parsed_body
     assert_equal "UNAUTHORIZED", json.dig("error", "code")
   end
+
+  test "ログイン時にセッションIDを再生成する" do
+    session_key = "_grim_note_session"
+    post api_v1_login_path, params: {
+      email: users(:alice).email,
+      password: "password123"
+    }, headers: { "Cookie" => "#{session_key}=attacker-session-id" }, **@json_headers
+
+    assert_response :success
+    set_cookie = response.get_header("Set-Cookie")
+    assert_includes set_cookie, session_key
+    refute_includes set_cookie, "attacker-session-id"
+  end
+
+  test "旧形式のpassword_digestでも500エラーにならない" do
+    legacy_user = users(:bob)
+    legacy_user.update_column(:password_digest, "legacy-plain-text")
+
+    post api_v1_login_path, params: {
+      email: legacy_user.email,
+      password: "password123"
+    }, **@json_headers
+
+    assert_response :unauthorized
+  end
 end

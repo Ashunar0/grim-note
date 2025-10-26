@@ -53,13 +53,17 @@
 | TEST-02-05 | ログアウト       | セッション破棄と Cookie クリアを確認                        | `session[:user_id]` 済み   | 1) ログイン済み状態を作る 2) `DELETE /api/v1/logout` 実行                                                                               | 200 / `status=success`、`session[:user_id]` が nil、レスポンス Cookie に有効期限切れが付与 | AC-3   |
 | TEST-02-06 | `/me` 正常       | ログイン済みで現在ユーザー情報が取得できることを確認        | ログイン済み              | 1) `GET /api/v1/me` を同一セッションで実行                                                                                               | 200 / `status=success`、`data.user.id` が現在ログインユーザー                               | AC-4   |
 | TEST-02-07 | `/me` 未認証     | 未ログインアクセスで `UNAUTHORIZED` が返ることを確認        | セッション未設定          | 1) Cookie なしで `GET /api/v1/me` 実行                                                                                                   | 401 / `status=error`、`error.code=UNAUTHORIZED`                                             | AC-4   |
-| TEST-02-08 | リクエストテスト | 追加したリクエストテストが自動実行で成功することを確認      | テスト環境構築済み        | 1) `bin/rails test TEST=test/requests/api/v1/authentication_test.rb` を実行                                                              | 全テスト Pass                                                                                 | AC-5   |
+| TEST-02-08 | リクエストテスト   | 追加したリクエストテストが自動実行で成功することを確認      | テスト環境構築済み        | 1) `bin/rails test TEST=test/requests/api/v1/authentication_test.rb` を実行                                                              | 全テスト Pass                                                                                 | AC-5   |
+| TEST-02-09 | セッション固定防止 | ログイン時にセッションIDが再生成されることを確認            | 既知のセッションIDをヘッダーに付与 | 1) 既存 Cookie を強制付与して `POST /api/v1/login` 実行 2) `Set-Cookie` を確認                                                         | 200 / 新しいセッションIDが払い出され、既存IDは維持されない                                   | AC-2   |
+| TEST-02-10 | 旧形式ダイジェスト | 旧形式 `password_digest` を持つユーザーがログインしても 500 にならないことを確認 | 旧形式の digest を持つユーザーを用意 | 1) `users(:bob)` の `password_digest` を旧形式に更新 2) `POST /api/v1/login` 実行                                                      | 401 / `status=error`。サーバーエラーにならず `UNAUTHORIZED` を返す                             | AC-2   |
 
 ## データセット（例）
 
 - フィクスチャ: `users(:alice)` などメールとハッシュ済みパスワード。
 - 新規登録用: `email: "user#{SecureRandom.hex(3)}@example.com"`, パスワードは 8 文字以上。
 - 誤り検証用: `password: "wrongpass"`, メール大文字混在など。
+- セッション固定検証: リクエストヘッダーに `_grim_note_session=attacker-session-id` を付与。
+- 旧形式 digest 検証: `users(:bob)` の `password_digest` を `legacy-plain-text` に更新して利用。
 
 ## 実行コマンド例
 
@@ -82,6 +86,7 @@ curl -i -c tmp/cookies -X POST http://localhost:3000/api/v1/login \
 | 実施日     | 担当      | 結果 | メモ |
 | ---------- | --------- | ---- | ---- |
 | 2025/10/26 | a.kawanobe | ✅   | `/Users/a.kawanobe/.local/share/gem/ruby/3.1.0/bin/bundle _2.3.27_ exec rails test test/requests/api/v1/authentication_test.rb` を実行し全テスト成功 |
+| 2025/10/26 | a.kawanobe | ✅   | セッション再生成・旧形式 digest 対応後に同コマンドを再実行し 9 件のリクエストテストが成功 |
 
 ## 要確認事項（未確定・オープン）
 
