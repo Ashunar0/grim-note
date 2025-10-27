@@ -15,6 +15,7 @@
 
 - 2025-10-26: Issue #4「next auth flow and session state」を完了。`rack-cors` 導入による CORS 許可設定と `useAuth.refresh()` を用いたセッション更新導線を反映済み。Rails コマンド実行には Bundler 2.3.27 が必要。
 - 2025-10-27: Bundler 2.3.27 をユーザー gem に再インストールし、`~/.zshrc` で `Gem.user_dir` を PATH に追加済み。新しいシェルでは `bundler -v` が 2.3.27 を返す。
+- 2025-10-27: Issue #5「timeline and post detail api integration」を完了。SWR ベースの `useTimelinePosts` / `usePostDetail` を追加し、`/timeline` と `/posts/:id` が API レスポンスを用いたローディング・エラー・空表示・404 ハンドリングを行うよう更新。PostCard に投稿日表示を追加。`npm run lint` と `npm run typecheck` で検証済み。
 
 # Repository Guidelines
 
