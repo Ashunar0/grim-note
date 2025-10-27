@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Heart, User } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import RatingStars from "./RatingStars";
+import { formatDateTime } from "@/lib/date";
 
 interface PostCardProps {
   id: string;
@@ -18,6 +19,7 @@ interface PostCardProps {
   userId: string;
   likes: number;
   isLiked?: boolean;
+  createdAt?: string;
 }
 
 export default function PostCard({
@@ -32,6 +34,7 @@ export default function PostCard({
   userId,
   likes,
   isLiked = false,
+  createdAt,
 }: PostCardProps) {
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-md">
@@ -44,7 +47,14 @@ export default function PostCard({
                 <User className="h-4 w-4" />
               </AvatarFallback>
             </Avatar>
-            <span className="text-sm font-medium hover:underline">{userName}</span>
+            <div className="leading-tight">
+              <p className="text-sm font-medium hover:underline">{userName}</p>
+              {createdAt && (
+                <p className="text-xs text-muted-foreground">
+                  {formatDateTime(createdAt)}
+                </p>
+              )}
+            </div>
           </Link>
         </div>
         <Link href={`/posts/${id}`}>

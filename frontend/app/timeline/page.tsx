@@ -1,101 +1,83 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
+import { Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostCard from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
-import { Plus } from "lucide-react";
-import Link from "next/link";
 import RequireAuth from "@/components/RequireAuth";
-import { apiClient } from "@/lib/api-client";
+import { useTimelinePosts, TimelineTab } from "@/hooks/use-timeline-posts";
 
-type TimelinePost = {
-  id: number;
-  body: string;
-  rating: number;
-  read_at: string | null;
-  created_at: string;
-  likes_count: number;
-  user: {
-    id: number;
-    name: string;
-  };
-  book: {
-    id: number;
-    title: string;
-    authors: string | null;
-    published_year: number | null;
-  } | null;
-  tags: { id: number; name: string }[];
-};
-
-export default function TimelinePage() {
-  const [activeTab, setActiveTab] = useState("recent");
-  const [posts, setPosts] = useState<TimelinePost[]>([]);
-  const [loading, setLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
+function useFollowingPrefetch(activeTab: TimelineTab) {
+  const [enabled, setEnabled] = useState(false);
 
   useEffect(() => {
-    const fetchPosts = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const response = await apiClient.get<{
-          status: string;
-          data: TimelinePost[];
-        }>("/posts", {
-          params: activeTab === "following" ? { tab: "following" } : undefined,
-        });
-        setPosts(response.data);
-      } catch (err: any) {
-        setError(err?.data?.error?.message ?? "タイムラインの取得に失敗しました");
-      } finally {
-        setLoading(false);
-      }
-    };
+    if (activeTab === "following" && !enabled) {
+      setEnabled(true);
+    }
+  }, [activeTab, enabled]);
 
-    fetchPosts();
-  }, [activeTab]);
+  return enabled;
+}
+
+export default function TimelinePage() {
+  const [activeTab, setActiveTab] = useState<TimelineTab>("recent");
+  const shouldFetchFollowing = useFollowingPrefetch(activeTab);
+  const recent = useTimelinePosts("recent");
+  const following = useTimelinePosts("following", shouldFetchFollowing);
+  const renderContent = (tab: TimelineTab) => {
+    const { posts, isLoading, error } = tab === "recent" ? recent : following;
+    const errorMessage =
+      error?.data?.error?.message ?? (error ? "タイムラインの取得に失敗しました" : null);
+    const emptyStateMessage =
+      tab === "following" ? "フォロー中のユーザーの投稿はまだありません" : "投稿がまだありません";
+
+    if (isLoading) {
+      return <div className="py-12 text-center text-muted-foreground">読み込み中...</div>;
+    }
+
+    if (errorMessage) {
+      return <div className="py-12 text-center text-destructive">{errorMessage}</div>;
+    }
+
+    if (posts.length === 0) {
+      return <div className="py-12 text-center text-muted-foreground">{emptyStateMessage}</div>;
+    }
+
+    return posts.map((post) => (
+      <PostCard
+        key={post.id}
+        id={post.id.toString()}
+        bookTitle={post.book?.title ?? ""}
+        author={post.book?.authors ?? ""}
+        content={post.body}
+        rating={post.rating}
+        tags={post.tags.map((tag) => tag.name)}
+        userName={post.user.name}
+        userId={post.user.id.toString()}
+        likes={post.likes_count}
+        isLiked={false}
+        createdAt={post.created_at}
+      />
+    ));
+  };
 
   return (
     <RequireAuth>
       <div className="container mx-auto max-w-3xl px-4 py-6">
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TimelineTab)} className="w-full">
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="recent">新着</TabsTrigger>
             <TabsTrigger value="following">フォロー中</TabsTrigger>
           </TabsList>
 
           <TabsContent value="recent" className="mt-6 space-y-4">
-            {loading ? (
-              <div className="py-12 text-center text-muted-foreground">読み込み中...</div>
-            ) : error ? (
-              <div className="py-12 text-center text-destructive">{error}</div>
-            ) : posts.length > 0 ? (
-              posts.map((post) => (
-                <PostCard
-                  key={post.id}
-                  id={post.id.toString()}
-                  bookTitle={post.book?.title ?? ""}
-                  author={post.book?.authors ?? ""}
-                  content={post.body}
-                  rating={post.rating}
-                  tags={post.tags.map((tag) => tag.name)}
-                  userName={post.user.name}
-                  userId={post.user.id.toString()}
-                  likes={post.likes_count}
-                  isLiked={false}
-                />
-              ))
-            ) : (
-              <div className="py-12 text-center text-muted-foreground">投稿がまだありません</div>
-            )}
+            {renderContent("recent")}
           </TabsContent>
 
           <TabsContent value="following" className="mt-6 space-y-4">
-            <div className="py-12 text-center text-muted-foreground">
-              フォロー中のユーザーの投稿はまだありません
-            </div>
+            {renderContent("following")}
           </TabsContent>
         </Tabs>
 
