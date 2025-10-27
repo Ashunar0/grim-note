@@ -12,10 +12,10 @@ docs/01_requirements.md の書誌検索要件と docs/04_api.md の `/api/v1/boo
 - リクエストテストで正常系・0 件・失敗時のレスポンスを検証し、`ENV["GOOGLE_BOOKS_API_KEY"]` の設定手順をドキュメント化
 
 ### ゴール / 完了条件（Acceptance Criteria）
-- [ ] サービスクラスで Google Books API を呼び出し、タイトル・著者・出版年・ISBN13 を正規化する
-- [ ] GET `/api/v1/books/search` が `q` パラメータ必須で結果を返し、0 件時は空配列を返却する
-- [ ] 失敗時に `SERVER_ERROR` を返し、ログへスタックトレースを残す
-- [ ] API キーを `ENV["GOOGLE_BOOKS_API_KEY"]` から取得し、設定手順をドキュメント化する
+- [x] サービスクラスで Google Books API を呼び出し、タイトル・著者・出版年・ISBN13 を正規化する
+- [x] GET `/api/v1/books/search` が `q` パラメータ必須で結果を返し、0 件時は空配列を返却する
+- [x] 失敗時に `SERVER_ERROR` を返し、ログへスタックトレースを残す
+- [x] API キーを `ENV["GOOGLE_BOOKS_API_KEY"]` から取得し、設定手順をドキュメント化する
 
 ### テスト観点
 - リクエスト / サービス

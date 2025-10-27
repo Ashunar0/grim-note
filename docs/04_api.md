@@ -182,6 +182,10 @@ curl "https://yomuplus.app/api/v1/books/search?q=君の名は"
 
 - `SERVER_ERROR` Google Books API 呼び出し失敗
 
+**環境変数**:
+
+開発・本番環境で Google Books API を利用するには、事前に `GOOGLE_BOOKS_API_KEY` を設定してください（例: `export GOOGLE_BOOKS_API_KEY="your-api-key"`）。
+
 ---
 
 ## 投稿関連

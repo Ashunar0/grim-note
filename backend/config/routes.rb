@@ -8,6 +8,7 @@ Rails.application.routes.draw do
       post "login", to: "sessions#create"
       delete "logout", to: "sessions#destroy"
       get "me", to: "current_users#show"
+      get "books/search", to: "books#search"
     end
   end
 end
