@@ -8,6 +8,8 @@ module GoogleBooks
 
     GOOGLE_BOOKS_ENDPOINT = URI("https://www.googleapis.com/books/v1/volumes")
     MAX_RESULTS = 10
+    OPEN_TIMEOUT_SECONDS = 3
+    READ_TIMEOUT_SECONDS = 5
     TITLE_FALLBACK = "タイトル不明"
     AUTHORS_FALLBACK = "著者不明"
 
@@ -20,7 +22,7 @@ module GoogleBooks
     end
 
     def call
-      response = Net::HTTP.get_response(build_uri)
+      response = perform_request
       unless response.is_a?(Net::HTTPSuccess)
         raise Error, "Google Books API responded with #{response.code}"
       end
@@ -29,12 +31,27 @@ module GoogleBooks
       items = Array(body["items"])
       items.map { |item| normalize_item(item) }
     rescue JSON::ParserError => e
-      raise Error, "Failed to parse Google Books API response: #{e.message}"
+      raise Error, "Failed to parse Google Books API response: #{e.message}", cause: e
     rescue StandardError => e
-      raise Error, e.message
+      raise Error.new(e.message), cause: e
     end
 
     private
+
+    def perform_request
+      uri = build_uri
+      request = Net::HTTP::Get.new(uri)
+
+      Net::HTTP.start(
+        uri.host,
+        uri.port,
+        use_ssl: uri.scheme == "https",
+        open_timeout: OPEN_TIMEOUT_SECONDS,
+        read_timeout: READ_TIMEOUT_SECONDS
+      ) do |http|
+        http.request(request)
+      end
+    end
 
     def build_uri
       uri = GOOGLE_BOOKS_ENDPOINT.dup

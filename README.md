@@ -70,7 +70,7 @@ npm run dev
 
 ## 環境変数
 今後の実装で以下の変数を利用予定です。必要に応じて `.env` やデプロイ先の環境変数に設定してください。
-- `GOOGLE_BOOKS_API_KEY`: Google Books API のキー
+- `GOOGLE_BOOKS_API_KEY`: Google Books API のキー。例: `backend/.env.local` に `GOOGLE_BOOKS_API_KEY="your-api-key"` を記述し、シェルで `set -a; source backend/.env.local; set +a` または `~/.zshrc` に `export GOOGLE_BOOKS_API_KEY=...` を追記して読み込む
 - `SESSION_SECRET` など Rails セッション関連のシークレット（Rails 7 では `bin/rails credentials:edit` で管理）
 
 ## 設計ドキュメント

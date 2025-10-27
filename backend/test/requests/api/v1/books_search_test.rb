@@ -1,4 +1,5 @@
 require "test_helper"
+require "stringio"
 
 class Api::V1::BooksSearchTest < ActionDispatch::IntegrationTest
   setup do
@@ -100,6 +101,34 @@ class Api::V1::BooksSearchTest < ActionDispatch::IntegrationTest
 
     get api_v1_books_search_path(q: "broken"), **@json_headers
 
+    assert_response :internal_server_error
+    json = response.parsed_body
+    assert_equal "SERVER_ERROR", json.dig("error", "code")
+  end
+
+  test "レート制限時もSERVER_ERRORを返しログ出力する" do
+    login_as_alice
+    stub_request(:get, "https://www.googleapis.com/books/v1/volumes")
+      .with(query: hash_including("q" => "ratelimit", "maxResults" => "10", "key" => "test-api-key"))
+      .to_return(status: 429, body: {
+        error: {
+          code: 429,
+          message: "Rate limit exceeded"
+        }
+      }.to_json, headers: { "Content-Type" => "application/json" })
+
+    log_output = StringIO.new
+    broadcast_logger = ActiveSupport::Logger.new(log_output)
+    Rails.logger.broadcasts << broadcast_logger
+
+    begin
+      get api_v1_books_search_path(q: "ratelimit"), **@json_headers
+    ensure
+      Rails.logger.broadcasts.delete(broadcast_logger)
+      broadcast_logger.close
+    end
+
+    assert_includes log_output.string, "GoogleBooks"
     assert_response :internal_server_error
     json = response.parsed_body
     assert_equal "SERVER_ERROR", json.dig("error", "code")
