@@ -37,7 +37,8 @@ class Api::V1::PostsCreateTest < ActionDispatch::IntegrationTest
     assert_equal "success", json["status"]
     post_data = json["data"]
     assert_equal "A brand new reflection.", post_data["body"]
-    tag_names = post_data["tags"].map { |tag| tag["name"] }
+    assert_equal books(:norwegian_wood).id, post_data["book_id"]
+    tag_names = post_data["tags"]
     assert_includes tag_names, "mythology"
     assert_includes tag_names, "philosophy"
     assert_equal 2, tag_names.uniq.size
@@ -64,13 +65,11 @@ class Api::V1::PostsCreateTest < ActionDispatch::IntegrationTest
     end
 
     assert_response :created
-    json = response.parsed_body
-    book_data = json.dig("data", "book")
-    assert_equal "Custom Title", book_data["title"]
-    assert_equal "Jane Doe", book_data["authors"]
-    assert_equal 2024, book_data["published_year"]
-
     created_book = Book.find_by(google_books_id: "new-gb-id")
+    json = response.parsed_body
+    post_data = json["data"]
+    assert_equal created_book.id, post_data["book_id"]
+    assert_equal ["essay"], post_data["tags"]
     assert_equal "9781234567897", created_book.isbn13
   end
 
@@ -93,6 +92,10 @@ class Api::V1::PostsCreateTest < ActionDispatch::IntegrationTest
          **@json_headers
 
     assert_response :created
+    json = response.parsed_body
+    post_data = json["data"]
+    assert_equal existing.id, post_data["book_id"]
+
     existing.reload
     assert_equal "Haruki Murakami", existing.authors
     assert_equal 1988, existing.published_year

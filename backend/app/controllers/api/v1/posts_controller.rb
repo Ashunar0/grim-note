@@ -26,7 +26,7 @@ module Api
       def create
         service = Posts::CreateService.new(user: current_user, params: create_params)
         post = service.call
-        render_success(data: serialize_post(post), status: :created)
+        render_success(data: serialize_created_post(post), status: :created)
       rescue ActiveRecord::RecordNotFound
         render_error(code: "VALIDATION_ERROR", message: "指定した書籍が見つかりません", status: :unprocessable_entity)
       rescue Posts::CreateService::Error => e
@@ -76,6 +76,17 @@ module Api
             published_year: post.book.published_year
           },
           tags: post.tags.map { |tag| { id: tag.id, name: tag.name } }
+        }
+      end
+
+      def serialize_created_post(post)
+        {
+          id: post.id,
+          book_id: post.book_id,
+          body: post.body,
+          rating: post.rating,
+          read_at: post.read_at,
+          tags: post.tags.map(&:name)
         }
       end
 
