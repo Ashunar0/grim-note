@@ -26,3 +26,12 @@ export type Post = {
   book: PostBook | null;
   tags: PostTag[];
 };
+
+export type PostCreateResponse = {
+  id: number;
+  book_id: number | null;
+  body: string;
+  rating: number;
+  read_at: string | null;
+  tags: string[];
+};
