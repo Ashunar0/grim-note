@@ -71,7 +71,7 @@ bin/rails test test/models/post_test.rb
 
 | 実施日     | 担当 | 結果 | メモ |
 | ---------- | ---- | ---- | ---- |
-| YYYY/MM/DD |      | ✅/❌ |      |
+| 2025/10/27 | codex | ✅ | `bundle exec rails test TEST=test/requests/api/v1/posts_create_test.rb` 実行。タグ正規化・未登録書籍保存・バリデーションエラーを確認。 |
 
 ## 要確認事項（未確定・オープン）
 
