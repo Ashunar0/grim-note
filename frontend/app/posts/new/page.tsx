@@ -15,6 +15,8 @@ import { CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
 import { ja } from "date-fns/locale";
 import { cn } from "@/lib/utils";
+import RequireAuth from "@/components/RequireAuth";
+import { apiClient } from "@/lib/api-client";
 
 export default function NewPostPage() {
   const router = useRouter();
@@ -24,14 +26,36 @@ export default function NewPostPage() {
   const [rating, setRating] = useState(3);
   const [finishedDate, setFinishedDate] = useState<Date>();
   const [tags, setTags] = useState("");
+  const [error, setError] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    router.push("/timeline");
+    setIsSubmitting(true);
+    setError(null);
+    try {
+      await apiClient.post("/posts", {
+        book_title: bookTitle,
+        author,
+        body: content,
+        rating,
+        read_at: finishedDate ? format(finishedDate, "yyyy-MM-dd") : null,
+        tags: tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter(Boolean),
+      });
+      router.push("/timeline");
+    } catch (err: any) {
+      setError(err?.data?.error?.message ?? "投稿に失敗しました");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
-    <div className="container mx-auto max-w-3xl px-4 py-6">
+    <RequireAuth>
+      <div className="container mx-auto max-w-3xl px-4 py-6">
       <Card>
         <CardHeader>
           <CardTitle>新しい投稿を作成</CardTitle>
@@ -130,9 +154,11 @@ export default function NewPostPage() {
               </p>
             </div>
 
+            {error && <p className="text-sm text-destructive">{error}</p>}
+
             <div className="flex space-x-3">
-              <Button type="submit" className="flex-1">
-                投稿する
+              <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                {isSubmitting ? "送信中..." : "投稿する"}
               </Button>
               <Button
                 type="button"
@@ -145,6 +171,7 @@ export default function NewPostPage() {
           </form>
         </CardContent>
       </Card>
-    </div>
+      </div>
+    </RequireAuth>
   );
 }

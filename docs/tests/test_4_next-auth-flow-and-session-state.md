@@ -71,9 +71,12 @@ npm run test:e2e
 
 ## 検証結果（記録用）
 
-| 実施日     | 担当 | 結果 | メモ |
-| ---------- | ---- | ---- | ---- |
-| YYYY/MM/DD |      | ✅/❌ |      |
+| 実施日     | 担当      | 結果 | メモ |
+| ---------- | --------- | ---- | ---- |
+| 2025/10/26 | a.kawanobe | ✅   | フォーム送信・エラー表示・ログアウト・ページリロードを `npm run dev` 上で手動確認 |
+| 2025/10/26 | codex      | ⚠️   | `npm run lint`/`npm run typecheck` 実行。lint で `<img>` 利用に関する警告を確認。UI 手動確認は未実施（コードレビューで要件確認）。 |
+| 2025/10/26 | codex      | ✅   | `frontend/components/BookCard.tsx` を再確認し、`next/image` 置換後に `npm run lint`/`npm run typecheck` を再実行。警告解消を確認。 |
+| 2025/10/26 | codex      | ✅   | chrome-dev-tools-mcp を用いて新規登録→ログイン→タイムライン遷移を確認。`/api/v1/login` が 200 応答となり、`refresh()` 呼び出しでコンテキストが更新されることを実地検証。 |
 
 ## 要確認事項（未確定・オープン）
 

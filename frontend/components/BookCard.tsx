@@ -1,7 +1,8 @@
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
+import { Card, CardFooter, CardHeader } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { BookOpen } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 
 interface BookCardProps {
   title: string;
@@ -23,7 +24,7 @@ export default function BookCard({
       <CardHeader className="pb-3">
         <div className="flex space-x-4">
           {thumbnail ? (
-            <img
+            <Image
               src={thumbnail}
               alt={title}
               className="h-24 w-16 rounded object-cover"
