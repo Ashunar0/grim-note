@@ -71,7 +71,7 @@ bin/rails test TEST=test/requests/api/v1/books_search_test.rb
 
 | 実施日     | 担当 | 結果 | メモ |
 | ---------- | ---- | ---- | ---- |
-| YYYY/MM/DD |      | ✅/❌ |      |
+| 2025/10/27 | codex | ✅ | `bundle exec rails test TEST=test/requests/api/v1/books_search_test.rb` 実行、全件成功。初回は gem 未インストールで失敗したため `bundle install` 後に再実行。 |
 
 ## 要確認事項（未確定・オープン）
 
