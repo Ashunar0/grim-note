@@ -26,6 +26,15 @@
 - 2025-10-28: Issue #12「follow feature and following timeline」対応済み。`POST/DELETE /api/v1/users/:id/follow` を実装し、タイムライン `tab=following`・プロフィールのフォローステータスを同期。`ProfileHeader` のフォローボタンとタイムラインのフォロー中タブを連携させ、`bin/rails test` と `npm run lint`, `npm run typecheck`, `npm run test -- --run` で確認。ドキュメント `docs/04_api.md` と受入テスト表 `docs/tests/test_12_follow-feature-and-following-timeline.md` を実装仕様に揃え、検証結果欄へ 2025/10/28 実行分を記録済み。
 - 2025-10-28: Issue #13「report form and contact api」対応済み。`POST /api/v1/reports` で Slack Webhook (`SLACK_REPORT_WEBHOOK_URL`) へ転送する API と `ReportForm` バリデーションを追加。`/contact` フォームから送信中インジケータ・成功/失敗メッセージを表示し、投稿詳細の通報ボタンは `?postId=` を付与。Slack Webhook URL は `.env.local` 等で設定し、未設定時は SERVER_ERROR を返す。
 
+## ここまでの実装サマリ (2025-10-28)
+
+- Issue #6: `GoogleBooks::SearchService` を実装。API キーは `backend/.env.local` 等に保存し、開発環境では SSL の CRL 検証回避を許容。本番では証明書を正しく設定する前提。
+- Issue #7-8: 投稿作成 API/フロントを連携。`POST /api/v1/posts` は書籍 ID・タグ配列を含むレスポンスを返し、Next.js 側で書籍検索→投稿作成まで一連のフォームを実装。受入テスト `docs/tests/test_7_post-create-api-and-tag-persistence.md` に準拠。
+- Issue #9-10: プロフィール閲覧/更新 API と UI を整備。`GET /api/v1/users/:id` は認証必須に揃え、編集ページでアイコン URL の空文字を null に正規化し、書籍情報欠如時は表示を抑制。
+- Issue #11-12: いいね・フォロー機能を API/フロント双方で実装。レスポンス仕様・受入テスト (`docs/tests/test_11_like-feature-and-ui-sync.md`, `docs/tests/test_12_follow-feature-and-following-timeline.md`) を更新し、未ログイン時のフォロータイムライン 401 をリクエストテストで担保。
+- Issue #13: 通報フォームから Slack Webhook へ投稿を転送。メール必須・本文 1000 文字制限・投稿 ID バリデーションを揃え、フロントフォームに `maxLength` を設定。`.env.local` または `~/.zshrc` で `SLACK_REPORT_WEBHOOK_URL` を読み込む運用を明記。
+- テスト: `bundle _2.3.27_ exec rails test`, `npm run lint`, `npm run typecheck`, `npm run test -- --run` を各実装完了時に実行しパスを確認。
+
 # Repository Guidelines
 
 ## Project Layout
