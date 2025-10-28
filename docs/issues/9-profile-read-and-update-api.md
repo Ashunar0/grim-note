@@ -12,10 +12,10 @@ docs/05_sitemap.md のプロフィールページ要件と docs/04_api.md のユ
 - Minitest リクエストテストで閲覧・更新・権限制御・未ログインアクセスを検証
 
 ### ゴール / 完了条件（Acceptance Criteria）
-- [ ] GET `/api/v1/users/:id` がプロフィール情報と投稿一覧、follower_count・following_count・post_count を返す
-- [ ] レスポンスに `is_following` と `is_self` を含める（未ログイン時は false）
-- [ ] PATCH `/api/v1/profile` が名前・自己紹介・アイコン URL を更新し、本人以外は `FORBIDDEN`
-- [ ] プロフィール取得・更新のリクエストテストが用意される
+- [x] GET `/api/v1/users/:id` がプロフィール情報と投稿一覧、follower_count・following_count・post_count を返す
+- [x] レスポンスに `is_following` と `is_self` を含める（未ログイン時は false）
+- [x] PATCH `/api/v1/profile` が名前・自己紹介・アイコン URL を更新し、本人以外は `FORBIDDEN`
+- [x] プロフィール取得・更新のリクエストテストが用意される
 
 ### テスト観点
 - リクエスト

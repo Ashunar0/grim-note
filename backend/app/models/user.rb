@@ -20,6 +20,11 @@ class User < ApplicationRecord
   validates :password_digest, presence: true
   validate :password_presence, if: -> { password_digest.blank? }
   validate :password_length, if: -> { password.present? }
+  validates :bio, length: { maximum: 160 }, allow_blank: true
+  validates :icon_url,
+            length: { maximum: 255 },
+            format: { with: URI::DEFAULT_PARSER.make_regexp(%w[http https]) },
+            allow_blank: true
 
   def password=(new_password)
     @password = new_password
