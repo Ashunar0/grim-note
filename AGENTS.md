@@ -1,6 +1,7 @@
 # プロジェクト上の留意点
 
 - ここまでの進捗まとめ:
+
   - Issue #1: Rails スキーマ/モデル/フィクスチャ整備、リクエストテスト基盤構築 (feat: bootstrap relational schema)
   - Issue #2: セッション認証 API 実装、PasswordDigest フォールバック、認証リクエストテスト追加 (feat: implement session auth api / fix: harden session auth behavior)
   - Issue #3: 投稿タイムライン/詳細 API 実装、ページネーション/likes_count 対応、リクエストテスト追加 (feat: add posts timeline api)
@@ -12,6 +13,7 @@
 - 実装中に生じたエラーや疑問点は、docs/配下に md ファイルとして記述・保存しておくこと。
 - 当初の設計から逸脱しなければならない場合は、かならず確認を取ること。
 - issue を実装した時は、人間が分かるように該当の issue ファイルのチェック欄にどこまで完了したかのチェックを入れること。
+- backend/vendor/bundle は、作ったら消さないこと。
 
 - 2025-10-26: Issue #4「next auth flow and session state」を完了。`rack-cors` 導入による CORS 許可設定と `useAuth.refresh()` を用いたセッション更新導線を反映済み。Rails コマンド実行には Bundler 2.3.27 が必要。
 - 2025-10-27: Bundler 2.3.27 をユーザー gem に再インストールし、`~/.zshrc` で `Gem.user_dir` を PATH に追加済み。新しいシェルでは `bundler -v` が 2.3.27 を返す。

@@ -34,3 +34,6 @@
 
 # env
 .env.local
+
+# Bundled gems for local use.
+/vendor/bundle
