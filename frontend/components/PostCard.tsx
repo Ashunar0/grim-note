@@ -9,8 +9,8 @@ import { formatDateTime } from "@/lib/date";
 
 interface PostCardProps {
   id: string;
-  bookTitle: string;
-  author: string;
+  bookTitle?: string;
+  author?: string;
   content: string;
   rating: number;
   tags: string[];
@@ -57,14 +57,20 @@ export default function PostCard({
             </div>
           </Link>
         </div>
-        <Link href={`/posts/${id}`}>
-          <div className="space-y-1">
-            <h3 className="text-lg font-semibold leading-tight hover:underline">
-              {bookTitle}
-            </h3>
-            <p className="text-sm text-muted-foreground">{author}</p>
-          </div>
-        </Link>
+        {(bookTitle || author) && (
+          <Link href={`/posts/${id}`}>
+            <div className="space-y-1">
+              {bookTitle && (
+                <h3 className="text-lg font-semibold leading-tight hover:underline">
+                  {bookTitle}
+                </h3>
+              )}
+              {author && (
+                <p className="text-sm text-muted-foreground">{author}</p>
+              )}
+            </div>
+          </Link>
+        )}
       </CardHeader>
 
       <CardContent className="space-y-3">

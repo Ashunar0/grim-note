@@ -12,10 +12,10 @@
 - 型定義や hooks（例: `useProfile`）を `frontend/hooks` などへ整理し、重複ロジックを共通化
 
 ### ゴール / 完了条件（Acceptance Criteria）
-- [ ] `/users/:id` が API レスポンスを描画し、投稿が無い場合の空状態も表示できる
-- [ ] `ProfileHeader` が `is_self` で編集ボタンの表示・非表示を切り替える
-- [ ] `/users/:id/edit` が初期値を API から読み込み、PATCH `/api/v1/profile` 成功後にプロフィールへ戻る
-- [ ] 本人以外が編集 URL にアクセスした際にトップまたはログインへリダイレクトする
+- [x] `/users/:id` が API レスポンスを描画し、投稿が無い場合の空状態も表示できる
+- [x] `ProfileHeader` が `is_self` で編集ボタンの表示・非表示を切り替える
+- [x] `/users/:id/edit` が初期値を API から読み込み、PATCH `/api/v1/profile` 成功後にプロフィールへ戻る
+- [x] 本人以外が編集 URL にアクセスした際にトップまたはログインへリダイレクトする
 
 ### テスト観点
 - 結合（フロントのデータフェッチ／フォーム）

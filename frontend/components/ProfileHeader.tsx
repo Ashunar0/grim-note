@@ -5,7 +5,7 @@ import { User, UserPlus, Settings } from "lucide-react";
 import Link from "next/link";
 
 interface ProfileHeaderProps {
-  userId: string;
+  userId: string | number;
   userName: string;
   bio?: string;
   avatar?: string;
@@ -27,6 +27,8 @@ export default function ProfileHeader({
   followingCount = 0,
   postCount = 0,
 }: ProfileHeaderProps) {
+  const profilePath = `/users/${userId}`;
+
   return (
     <Card>
       <CardContent className="pt-6">
@@ -63,7 +65,7 @@ export default function ProfileHeader({
 
             {isOwnProfile ? (
               <Button variant="outline" asChild>
-                <Link href={`/users/${userId}/edit`}>
+                <Link href={`${profilePath}/edit`}>
                   <Settings className="mr-2 h-4 w-4" />
                   プロフィール編集
                 </Link>
