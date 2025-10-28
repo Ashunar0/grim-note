@@ -76,6 +76,15 @@ class Api::V1::PostLikesTest < ActionDispatch::IntegrationTest
     assert_equal "NOT_FOUND", json.dig("error", "code")
   end
 
+  test "存在しない投稿へのいいね追加は 404" do
+    login_as(@alice)
+
+    post api_v1_post_like_path(-999), params: {}, **@json_headers
+
+    assert_response :not_found
+    assert_equal "NOT_FOUND", response.parsed_body.dig("error", "code")
+  end
+
   private
 
   def login_as(user)

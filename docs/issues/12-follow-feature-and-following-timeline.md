@@ -13,10 +13,10 @@ docs/01_requirements.md のフォロー機能と docs/05_sitemap.md のフォロ
 - リクエストテストとフロント結合テスト/手動確認でフォロー導線を検証
 
 ### ゴール / 完了条件（Acceptance Criteria）
-- [ ] POST/DELETE `/api/v1/users/:id/follow` が follows テーブルを更新し、本人や重複フォローを拒否する
-- [ ] GET `/api/v1/users/:id` がフォロー状態とフォロワー数を最新値で返す
-- [ ] GET `/api/v1/posts?tab=following` がフォロー中ユーザーの投稿のみ返す
-- [ ] プロフィール画面とタイムラインでフォローボタン/フォロー中タブがリアルタイムに状態更新される
+- [x] POST/DELETE `/api/v1/users/:id/follow` が follows テーブルを更新し、本人や重複フォローを拒否する
+- [x] GET `/api/v1/users/:id` がフォロー状態とフォロワー数を最新値で返す
+- [x] GET `/api/v1/posts?tab=following` がフォロー中ユーザーの投稿のみ返す
+- [x] プロフィール画面とタイムラインでフォローボタン/フォロー中タブがリアルタイムに状態更新される
 
 ### テスト観点
 - リクエスト（フォロー API） / 結合（フロント）

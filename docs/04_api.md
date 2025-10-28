@@ -373,14 +373,25 @@ curl -X POST https://yomuplus.app/api/v1/posts \
 **認証**: 必要
 **説明**: 指定ユーザーをフォロー
 
-#### レスポンス例
+#### レスポンス例 (201 Created)
 
 ```json
 {
   "status": "success",
-  "data": { "following": true }
+  "data": {
+    "user_id": 3,
+    "follower_count": 42,
+    "following_count": 12,
+    "is_following": true
+  }
 }
 ```
+
+**エラー**:
+
+- `INVALID_OPERATION` 自分自身をフォローしようとした
+- `NOT_FOUND` ユーザーが存在しない
+- `UNAUTHORIZED` 未ログイン
 
 ---
 
@@ -389,14 +400,24 @@ curl -X POST https://yomuplus.app/api/v1/posts \
 **認証**: 必要
 **説明**: 指定ユーザーのフォローを解除
 
-#### レスポンス例
+#### レスポンス例 (200 OK)
 
 ```json
 {
   "status": "success",
-  "data": { "following": false }
+  "data": {
+    "user_id": 3,
+    "follower_count": 41,
+    "following_count": 11,
+    "is_following": false
+  }
 }
 ```
+
+**エラー**:
+
+- `NOT_FOUND` ユーザーが存在しない
+- `UNAUTHORIZED` 未ログイン
 
 ---
 

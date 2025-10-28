@@ -14,6 +14,8 @@ interface ProfileHeaderProps {
   followerCount?: number;
   followingCount?: number;
   postCount?: number;
+  onToggleFollow?: () => void;
+  followDisabled?: boolean;
 }
 
 export default function ProfileHeader({
@@ -26,6 +28,8 @@ export default function ProfileHeader({
   followerCount = 0,
   followingCount = 0,
   postCount = 0,
+  onToggleFollow,
+  followDisabled = false,
 }: ProfileHeaderProps) {
   const profilePath = `/users/${userId}`;
 
@@ -71,7 +75,12 @@ export default function ProfileHeader({
                 </Link>
               </Button>
             ) : (
-              <Button variant={isFollowing ? "outline" : "default"}>
+              <Button
+                variant={isFollowing ? "outline" : "default"}
+                onClick={onToggleFollow}
+                disabled={followDisabled || !onToggleFollow}
+                aria-pressed={isFollowing}
+              >
                 <UserPlus className="mr-2 h-4 w-4" />
                 {isFollowing ? "フォロー中" : "フォローする"}
               </Button>

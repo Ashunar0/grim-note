@@ -1,9 +1,15 @@
 "use client";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { mutate as mutateGlobal } from "swr";
+import { useState } from "react";
 import ProfileHeader from "@/components/ProfileHeader";
 import PostCard from "@/components/PostCard";
 import { useProfile } from "@/hooks/use-profile";
+import { apiClient } from "@/lib/api-client";
+import type { ApiClientError } from "@/types/api";
+import { useAuth } from "@/hooks/use-auth";
 
 type UserProfilePageProps = {
   params: { id: string };
@@ -17,7 +23,11 @@ const ErrorMessage = ({ children }: { children: React.ReactNode }) => (
 
 export default function UserProfilePage({ params }: UserProfilePageProps) {
   const userId = Number(params.id);
-  const { profile, isLoading, error } = useProfile(Number.isNaN(userId) ? params.id : userId);
+  const router = useRouter();
+  const { user } = useAuth();
+  const [followLoading, setFollowLoading] = useState(false);
+  const idParam = Number.isNaN(userId) ? params.id : userId;
+  const { profile, isLoading, error, mutate } = useProfile(idParam);
 
   if (isLoading) {
     return (
@@ -64,6 +74,34 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
 
   const posts = profile.posts ?? [];
 
+  const handleToggleFollow = async () => {
+    if (!profile || profile.is_self) return;
+    if (!user) {
+      router.push(LOGIN_PATH);
+      return;
+    }
+
+    setFollowLoading(true);
+
+    try {
+      if (profile.is_following) {
+        await apiClient.delete(`/users/${profile.id}/follow`);
+      } else {
+        await apiClient.post(`/users/${profile.id}/follow`);
+      }
+
+      await mutate();
+      await mutateGlobal(["timeline", "following"]);
+    } catch (err) {
+      const apiError = err as ApiClientError;
+      if (apiError.status === 401) {
+        router.push(LOGIN_PATH);
+      }
+    } finally {
+      setFollowLoading(false);
+    }
+  };
+
   return (
     <div className="container mx-auto max-w-3xl px-4 py-6">
       <div className="space-y-6">
@@ -77,6 +115,8 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
           followerCount={profile.follower_count}
           followingCount={profile.following_count}
           postCount={profile.post_count}
+          onToggleFollow={profile.is_self ? undefined : handleToggleFollow}
+          followDisabled={followLoading}
         />
 
         <div className="space-y-4">
