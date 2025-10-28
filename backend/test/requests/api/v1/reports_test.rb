@@ -56,7 +56,8 @@ class Api::V1::ReportsTest < ActionDispatch::IntegrationTest
     post api_v1_reports_path,
          params: {
            category: "bug",
-           message: "表示が崩れています"
+           message: "表示が崩れています",
+           email: "reporter@example.com"
          },
          **@json_headers
 

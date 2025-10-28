@@ -10,11 +10,9 @@ class ReportForm
   attribute :email, :string
 
   validates :category, presence: true, inclusion: { in: CATEGORIES }
-  validates :message, presence: true, length: { maximum: 1000 }
-  validates :email,
-            allow_blank: true,
-            format: { with: URI::MailTo::EMAIL_REGEXP }
 
+  validate :validate_message
+  validate :validate_email
   validate :post_must_exist
 
   def attributes
@@ -23,10 +21,26 @@ class ReportForm
 
   private
 
+  def validate_message
+    if message.blank?
+      errors.add(:base, "お問い合わせ内容を入力してください")
+    elsif message.length > 1000
+      errors.add(:base, "お問い合わせ内容は1000文字以内で入力してください")
+    end
+  end
+
+  def validate_email
+    if email.blank?
+      errors.add(:base, "メールアドレスを入力してください")
+    elsif email !~ URI::MailTo::EMAIL_REGEXP
+      errors.add(:base, "メールアドレスが不正です")
+    end
+  end
+
   def post_must_exist
     return if post_id.blank?
     return if Post.exists?(id: post_id)
 
-    errors.add(:post_id, "が見つかりません")
+    errors.add(:base, "投稿が見つかりません")
   end
 end

@@ -1,0 +1,18 @@
+ja:
+  activemodel:
+    attributes:
+      report_form:
+        email: メールアドレス
+        message: お問い合わせ内容
+        category: お問い合わせ種別
+    errors:
+      models:
+        report_form:
+          attributes:
+            email:
+              blank: "%{attribute}を入力してください"
+              invalid: "%{attribute}が不正です"
+            message:
+              too_long: "%{attribute}は%{count}文字以内で入力してください"
+            base:
+              blank_post: "投稿が見つかりません"

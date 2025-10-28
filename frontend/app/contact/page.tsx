@@ -184,6 +184,7 @@ export default function ContactPage() {
                   handleFieldMutation();
                 }}
                 rows={8}
+                maxLength={1000}
                 required
               />
             </div>
