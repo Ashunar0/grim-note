@@ -42,18 +42,20 @@ module GoogleBooks
     def fetch_response_body
       uri = build_uri
       Rails.logger.info("[GoogleBooks] env=#{Rails.env}")
-      if Rails.env.development?
-        fetch_with_open_uri(uri)
-      else
-        response = perform_http_request(uri)
-        [response.body, response.code]
-      end
+      return fetch_with_open_uri(uri) if relaxed_ssl_environment?
+
+      response = perform_http_request(uri)
+      [response.body, response.code]
     rescue OpenSSL::SSL::SSLError => e
-      Rails.logger.warn("[GoogleBooks] SSL error #{e.class}: #{e.message}. Retrying with open-uri.")
-      fetch_with_open_uri(uri)
+      Rails.logger.error("[GoogleBooks] SSL error #{e.class}: #{e.message}")
+      handle_ssl_error!(e, uri)
     end
 
     def fetch_with_open_uri(uri)
+      unless relaxed_ssl_environment?
+        raise Error.new("SSL fallback is restricted to development/test environments")
+      end
+
       Rails.logger.info("[GoogleBooks] fetching via open-uri")
       io = URI.open(uri, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
       [io.read, 200]
@@ -96,7 +98,15 @@ module GoogleBooks
 
       http.instance_variable_set(:@ssl_context, context)
     end
-    
+
+    def handle_ssl_error!(error, uri)
+      if relaxed_ssl_environment?
+        Rails.logger.warn("[GoogleBooks] Retrying with VERIFY_NONE (development)")
+        fetch_with_open_uri(uri)
+      else
+        raise Error.new("Failed to establish SSL connection to Google Books API. Check SSL_CERT_FILE / SSL_CERT_DIR settings."), cause: error
+      end
+    end
 
     def build_uri
       uri = GOOGLE_BOOKS_ENDPOINT.dup
@@ -151,6 +161,10 @@ module GoogleBooks
       if published_date =~ /\A(\d{4})/
         Regexp.last_match(1).to_i
       end
+    end
+
+    def relaxed_ssl_environment?
+      Rails.env.development? || Rails.env.test?
     end
   end
 end
