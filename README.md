@@ -61,12 +61,14 @@ npm run dev
 ```
 
 ## テスト・品質チェック
-- Rails テスト: `cd backend && bin/rails test`
-- Rails lint: `cd backend && bin/rubocop`
+- 統合チェック: リポジトリ直下で `./bin/check`（Rails テスト→RuboCop→Next.js lint を順に実行）
+- Rails テスト: `cd backend && bundle _2.3.27_ exec rails test`
+- Rails lint: `cd backend && bundle _2.3.27_ exec rubocop`
 - Next.js lint: `cd frontend && npm run lint`
-- （任意）型チェック: `cd frontend && npm run typecheck`
+- 型チェック: `cd frontend && npm run typecheck`
+- フロントテスト: `cd frontend && npm run test -- --run`
 
-将来的に `docs/issues/14-quality-gates-and-ci-setup.md` のとおり CI ワークフローと統合チェックスクリプトを整備予定です。
+GitHub Actions には `Quality Gates` ワークフローを追加しており、Push / Pull Request ごとに上記の Rails テスト・RuboCop・Next.js lint が自動実行されます。CI 結果が失敗した場合はローカルで `./bin/check` を実行して差分を確認してください。
 
 ## 環境変数
 今後の実装で以下の変数を利用予定です。必要に応じて `.env` やデプロイ先の環境変数に設定してください。
