@@ -87,4 +87,26 @@ class Api::V1::PostsTest < ActionDispatch::IntegrationTest
     assert_equal "error", json["status"]
     assert_equal "NOT_FOUND", json.dig("error", "code")
   end
+
+  test "フォロー中タブはフォロー中ユーザーの投稿のみ返す" do
+    login_as(users(:alice))
+    posts(:alice_post) # ensure fixtures loaded
+
+    get api_v1_posts_path(tab: "following"), **@json_headers
+
+    assert_response :success
+    json = response.parsed_body
+    ids = json["data"].map { |p| p["id"] }
+    assert_includes ids, posts(:bob_post).id
+    refute_includes ids, posts(:alice_post).id
+  end
+
+  private
+
+  def login_as(user)
+    post api_v1_login_path,
+         params: { email: user.email, password: "password123" },
+         **@json_headers
+    assert_response :success
+  end
 end

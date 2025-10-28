@@ -14,13 +14,16 @@
 - 当初の設計から逸脱しなければならない場合は、かならず確認を取ること。
 - issue を実装した時は、人間が分かるように該当の issue ファイルのチェック欄にどこまで完了したかのチェックを入れること。
 - backend/vendor/bundle は、作ったら消さないこと。
-- Rails テスト実行時は Ruby 3.1.6 + Bundler 2.3.27 を使用し、`bundle _2.3.27_ exec rails test` で全27件が通る状態を維持すること。
+- issues/の実装が終わったら、対応する tests/のテストを実行し、テストの結果を最下部の検証結果欄に記載すること。
+- 実装がひと段落したら、git にコミットし、リモートに push すること。
+- Rails テスト実行時は Ruby 3.1.6 + Bundler 2.3.27 を使用し、`bundle _2.3.27_ exec rails test` で全 27 件が通る状態を維持すること。
 - いいね機能実装後は API に `likes_count`/`is_liked` が含まれる。`POST /api/v1/posts/:id/like` は既存ユーザー likes でも 200 を返す (idempotent) ため、フロントは楽観的更新後に再フェッチする実装とすること。
 - Rails で新しい controller/serializer を追加した際はサーバー再起動が必要。
 
 - 2025-10-26: Issue #4「next auth flow and session state」を完了。`rack-cors` 導入による CORS 許可設定と `useAuth.refresh()` を用いたセッション更新導線を反映済み。Rails コマンド実行には Bundler 2.3.27 が必要。
 - 2025-10-27: Bundler 2.3.27 をユーザー gem に再インストールし、`~/.zshrc` で `Gem.user_dir` を PATH に追加済み。新しいシェルでは `bundler -v` が 2.3.27 を返す。
 - 2025-10-27: Issue #5「timeline and post detail api integration」を完了。SWR ベースの `useTimelinePosts` / `usePostDetail` を追加し、`/timeline` と `/posts/:id` が API レスポンスを用いたローディング・エラー・空表示・404 ハンドリングを行うよう更新。PostCard に投稿日表示を追加。`npm run lint` と `npm run typecheck` で検証済み。
+- 2025-10-28: Issue #12「follow feature and following timeline」対応済み。`POST/DELETE /api/v1/users/:id/follow` を実装し、タイムライン `tab=following`・プロフィールのフォローステータスを同期。`ProfileHeader` のフォローボタンとタイムラインのフォロー中タブを連携させ、`bin/rails test` と `npm run lint`, `npm run typecheck`, `npm run test -- --run` で確認。ドキュメント `docs/04_api.md` と受入テスト表 `docs/tests/test_12_follow-feature-and-following-timeline.md` を実装仕様に揃え、検証結果欄へ 2025/10/28 実行分を記録済み。
 
 # Repository Guidelines
 

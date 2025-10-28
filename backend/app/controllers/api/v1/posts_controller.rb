@@ -5,6 +5,7 @@ module Api
     class PostsController < ApplicationController
       PER_PAGE = 10
       before_action :authenticate_user!, only: [:create]
+      before_action :require_following_auth!, only: [:index]
 
       def index
         posts = timeline_scope
@@ -53,7 +54,11 @@ module Api
       end
 
       def timeline_scope
-        Post.with_like_stats
+        scope = Post.with_like_stats
+        if params[:tab].to_s == "following"
+          scope = scope.where(user_id: current_user.following_users.select(:id))
+        end
+        scope
       end
 
       def serialize_post(post, liked_post_ids: nil)
@@ -80,6 +85,12 @@ module Api
         return Set.new if ids.empty?
 
         current_user.likes.where(post_id: ids).pluck(:post_id).to_set
+      end
+
+      def require_following_auth!
+        return unless params[:tab].to_s == "following"
+
+        authenticate_user!
       end
 
       def create_params

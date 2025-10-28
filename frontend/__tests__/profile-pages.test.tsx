@@ -120,6 +120,66 @@ describe("UserProfilePage", () => {
     expect(screen.queryByRole("link", { name: /プロフィール編集/ })).not.toBeInTheDocument();
   });
 
+  it("フォローボタンでフォロー状態をトグルする", async () => {
+    let isFollowing = false;
+    server.use(
+      http.get(`${API_BASE_URL}/users/2`, () =>
+        HttpResponse.json(
+          { status: "success", data: buildProfile({ id: 2, is_self: false, is_following: isFollowing }) },
+          { status: 200 },
+        ),
+      ),
+      http.post(`${API_BASE_URL}/users/2/follow`, () => {
+        isFollowing = true;
+        return HttpResponse.json(
+          {
+            status: "success",
+            data: { user_id: 2, follower_count: 3, following_count: 1, is_following: true },
+          },
+          { status: 201 },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    await renderWithSWR(<UserProfilePage params={{ id: "2" }} />);
+
+    await user.click(await screen.findByRole("button", { name: "フォローする" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "フォロー中" })).toBeInTheDocument();
+    });
+  });
+
+  it("フォロー API が 401 を返した場合はログインへ誘導する", async () => {
+    server.use(
+      http.get(`${API_BASE_URL}/users/2`, () =>
+        HttpResponse.json(
+          { status: "success", data: buildProfile({ id: 2, is_self: false, is_following: false }) },
+          { status: 200 },
+        ),
+      ),
+      http.post(`${API_BASE_URL}/users/2/follow`, () =>
+        HttpResponse.json(
+          {
+            status: "error",
+            error: { code: "UNAUTHORIZED", message: "ログインが必要です" },
+          },
+          { status: 401 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    await renderWithSWR(<UserProfilePage params={{ id: "2" }} />);
+
+    await user.click(await screen.findByRole("button", { name: "フォローする" }));
+
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith("/login");
+    });
+  });
+
   it("未ログイン時はログイン導線を表示する (TEST-10-04)", async () => {
     setAuthMockState({ user: null });
     server.use(

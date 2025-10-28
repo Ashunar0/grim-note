@@ -3,7 +3,9 @@ Rails.application.routes.draw do
 
   namespace :api do
     namespace :v1 do
-      resources :users, only: [:create, :show]
+      resources :users, only: [:create, :show] do
+        resource :follow, only: [:create, :destroy], controller: "user_follows"
+      end
       resources :posts, only: [:index, :show, :create] do
         resource :like, only: [:create, :destroy], controller: "post_likes"
       end
