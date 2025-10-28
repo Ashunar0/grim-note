@@ -101,6 +101,14 @@ class Api::V1::PostsTest < ActionDispatch::IntegrationTest
     refute_includes ids, posts(:alice_post).id
   end
 
+  test "未ログインでフォロー中タブにアクセスすると401を返す" do
+    get api_v1_posts_path(tab: "following"), **@json_headers
+
+    assert_response :unauthorized
+    json = response.parsed_body
+    assert_equal "UNAUTHORIZED", json.dig("error", "code")
+  end
+
   private
 
   def login_as(user)
