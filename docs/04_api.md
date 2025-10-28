@@ -289,16 +289,40 @@ curl -X POST https://yomuplus.app/api/v1/posts \
 ### POST /api/v1/posts/:id/like
 
 **認証**: 必要
-**説明**: 投稿に「いいね」を付与
+**説明**: 投稿に「いいね」を付与（既にいいね済みの場合は `200 OK` で状態維持）
 
-#### レスポンス例
+#### レスポンス例 (201 Created)
 
 ```json
 {
   "status": "success",
-  "data": { "likes_count": 12 }
+  "data": {
+    "id": 42,
+    "body": "読了メモ",
+    "rating": 5,
+    "read_at": "2025-10-20",
+    "created_at": "2025-10-21T12:34:56Z",
+    "likes_count": 12,
+    "is_liked": true,
+    "user": { "id": 3, "name": "Alice" },
+    "book": {
+      "id": 10,
+      "title": "ノルウェイの森",
+      "authors": "村上春樹",
+      "published_year": 1987
+    },
+    "tags": [
+      { "id": 1, "name": "文学" },
+      { "id": 2, "name": "日本" }
+    ]
+  }
 }
 ```
+
+**エラー**:
+
+- `NOT_FOUND` 指定した投稿が存在しない
+- `UNAUTHORIZED` 未ログイン（セッション切れ）
 
 ---
 
@@ -307,14 +331,38 @@ curl -X POST https://yomuplus.app/api/v1/posts \
 **認証**: 必要
 **説明**: 「いいね」を取り消し
 
-#### レスポンス例
+#### レスポンス例 (200 OK)
 
 ```json
 {
   "status": "success",
-  "data": { "likes_count": 11 }
+  "data": {
+    "id": 42,
+    "likes_count": 11,
+    "is_liked": false,
+    "user": { "id": 3, "name": "Alice" },
+    "book": {
+      "id": 10,
+      "title": "ノルウェイの森",
+      "authors": "村上春樹",
+      "published_year": 1987
+    },
+    "body": "読了メモ",
+    "rating": 5,
+    "read_at": "2025-10-20",
+    "created_at": "2025-10-21T12:34:56Z",
+    "tags": [
+      { "id": 1, "name": "文学" },
+      { "id": 2, "name": "日本" }
+    ]
+  }
 }
 ```
+
+**エラー**:
+
+- `NOT_FOUND` 指定した投稿が存在しない
+- `UNAUTHORIZED` 未ログイン（セッション切れ）
 
 ---
 
