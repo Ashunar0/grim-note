@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { SWRConfig } from "swr";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { resetNextNavigationMocks, setMockPathname } from "@/test/mocks/next-navigation";
+import { pushMock, resetNextNavigationMocks, setMockPathname } from "@/test/mocks/next-navigation";
 import { resetAuthMocks } from "@/test/mocks/use-auth";
 import TimelinePage from "@/app/timeline/page";
 import { server } from "@/test/server";
@@ -17,6 +17,7 @@ const buildPost = (overrides: Partial<import("@/types/posts").Post> = {}) => ({
   read_at: "2024-01-01T00:00:00.000Z",
   created_at: "2024-01-02T12:00:00.000Z",
   likes_count: 10,
+  is_liked: false,
   user: { id: 99, name: "Alice" },
   book: { id: 77, title: "テスト書籍", authors: "著者A", published_year: 2020 },
   tags: [
@@ -164,5 +165,89 @@ describe("TimelinePage", () => {
     await renderWithSWR(<TimelinePage />);
 
     expect(await screen.findByText("サーバーエラー")).toBeInTheDocument();
+  });
+
+  it("いいねボタンで likes が更新される", async () => {
+    let liked = false;
+    let likesCount = 3;
+
+    server.use(
+      http.get(`${API_BASE_URL}/posts`, () =>
+        HttpResponse.json(
+          {
+            status: "success",
+            data: [
+              buildPost({ id: 1, likes_count: likesCount, is_liked: liked, body: "いいねテスト" }),
+            ],
+          },
+          { status: 200 },
+        ),
+      ),
+      http.post(`${API_BASE_URL}/posts/:id/like`, () => {
+        liked = true;
+        likesCount += 1;
+        return HttpResponse.json(
+          {
+            status: "success",
+            data: buildPost({ id: 1, likes_count: likesCount, is_liked: liked }),
+          },
+          { status: 201 },
+        );
+      }),
+      http.delete(`${API_BASE_URL}/posts/:id/like`, () => {
+        liked = false;
+        likesCount -= 1;
+        return HttpResponse.json(
+          {
+            status: "success",
+            data: buildPost({ id: 1, likes_count: likesCount, is_liked: liked }),
+          },
+          { status: 200 },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    await renderWithSWR(<TimelinePage />);
+
+    const likeButton = await screen.findByRole("button", { name: "3" });
+    await user.click(likeButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "4" })).toHaveClass("text-red-500");
+    });
+
+    await user.click(screen.getByRole("button", { name: "4" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "3" })).not.toHaveClass("text-red-500");
+    });
+  });
+
+  it("いいね API が 401 を返した場合にログインへ誘導する", async () => {
+    const post = buildPost({ likes_count: 2, is_liked: false });
+    server.use(
+      http.get(`${API_BASE_URL}/posts`, () =>
+        HttpResponse.json({ status: "success", data: [post] }, { status: 200 }),
+      ),
+      http.post(`${API_BASE_URL}/posts/:id/like`, () =>
+        HttpResponse.json(
+          {
+            status: "error",
+            error: { code: "UNAUTHORIZED", message: "ログインが必要です" },
+          },
+          { status: 401 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    await renderWithSWR(<TimelinePage />);
+
+    await user.click(await screen.findByRole("button", { name: "2" }));
+
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith("/login");
+    });
   });
 });

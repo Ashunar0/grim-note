@@ -47,6 +47,7 @@ const buildProfile = (
       read_at: "2024-01-01",
       created_at: "2024-01-05T12:00:00.000Z",
       likes_count: 5,
+      is_liked: false,
       book: {
         id: 100,
         title: "吾輩は猫である",
@@ -149,6 +150,7 @@ describe("UserProfilePage", () => {
           read_at: "2024-01-01",
           created_at: "2024-01-05T12:00:00.000Z",
           likes_count: 5,
+          is_liked: false,
           book: null,
           tags: [],
         },

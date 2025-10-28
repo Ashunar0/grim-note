@@ -4,7 +4,9 @@ Rails.application.routes.draw do
   namespace :api do
     namespace :v1 do
       resources :users, only: [:create, :show]
-      resources :posts, only: [:index, :show, :create]
+      resources :posts, only: [:index, :show, :create] do
+        resource :like, only: [:create, :destroy], controller: "post_likes"
+      end
       post "login", to: "sessions#create"
       delete "logout", to: "sessions#destroy"
       get "me", to: "current_users#show"

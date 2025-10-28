@@ -10,6 +10,13 @@ class Post < ApplicationRecord
   validates :body, presence: true, length: { maximum: 500 }
   validates :rating, presence: true, inclusion: { in: 1..5 }
 
+  scope :with_like_stats, lambda {
+    includes(:user, :book, :tags)
+      .left_outer_joins(:likes)
+      .select("posts.*, COUNT(DISTINCT likes.id) AS likes_count")
+      .group("posts.id")
+  }
+
   def likes_count
     (self[:likes_count] || likes.size).to_i
   end

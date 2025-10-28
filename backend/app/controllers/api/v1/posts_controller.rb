@@ -1,3 +1,5 @@
+require "set"
+
 module Api
   module V1
     class PostsController < ApplicationController
@@ -10,14 +12,15 @@ module Api
                  .limit(per_page)
                  .offset(offset_for_page)
 
-        render_success(data: posts.map { |post| serialize_post(post) })
+        liked_ids = liked_post_ids_for(posts)
+        render_success(data: posts.map { |post| serialize_post(post, liked_post_ids: liked_ids) })
       end
 
       def show
         post = timeline_scope.find_by(id: params[:id])
 
         if post
-          render_success(data: serialize_post(post))
+          render_success(data: serialize_post(post, liked_post_ids: liked_post_ids_for([post])))
         else
           render_error(code: "NOT_FOUND", message: "投稿が見つかりません", status: :not_found)
         end
@@ -50,33 +53,11 @@ module Api
       end
 
       def timeline_scope
-        Post
-          .includes(:user, :book, :tags)
-          .left_outer_joins(:likes)
-          .select('posts.*, COUNT(DISTINCT likes.id) AS likes_count')
-          .group('posts.id')
+        Post.with_like_stats
       end
 
-      def serialize_post(post)
-        {
-          id: post.id,
-          body: post.body,
-          rating: post.rating,
-          read_at: post.read_at,
-          created_at: post.created_at,
-          likes_count: post.likes_count,
-          user: {
-            id: post.user.id,
-            name: post.user.name
-          },
-          book: post.book && {
-            id: post.book.id,
-            title: post.book.title,
-            authors: post.book.authors,
-            published_year: post.book.published_year
-          },
-          tags: post.tags.map { |tag| { id: tag.id, name: tag.name } }
-        }
+      def serialize_post(post, liked_post_ids: nil)
+        PostSerializer.new(post: post, current_user: current_user, liked_post_ids: liked_post_ids).as_json
       end
 
       def serialize_created_post(post)
@@ -86,8 +67,19 @@ module Api
           body: post.body,
           rating: post.rating,
           read_at: post.read_at,
-          tags: post.tags.map(&:name)
+          tags: post.tags.map(&:name),
+          likes_count: 0,
+          is_liked: false
         }
+      end
+
+      def liked_post_ids_for(posts)
+        return Set.new unless current_user
+
+        ids = posts.compact.map(&:id)
+        return Set.new if ids.empty?
+
+        current_user.likes.where(post_id: ids).pluck(:post_id).to_set
       end
 
       def create_params

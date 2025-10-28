@@ -15,6 +15,8 @@
 - issue を実装した時は、人間が分かるように該当の issue ファイルのチェック欄にどこまで完了したかのチェックを入れること。
 - backend/vendor/bundle は、作ったら消さないこと。
 - Rails テスト実行時は Ruby 3.1.6 + Bundler 2.3.27 を使用し、`bundle _2.3.27_ exec rails test` で全27件が通る状態を維持すること。
+- いいね機能実装後は API に `likes_count`/`is_liked` が含まれる。`POST /api/v1/posts/:id/like` は既存ユーザー likes でも 200 を返す (idempotent) ため、フロントは楽観的更新後に再フェッチする実装とすること。
+- Rails で新しい controller/serializer を追加した際はサーバー再起動が必要。
 
 - 2025-10-26: Issue #4「next auth flow and session state」を完了。`rack-cors` 導入による CORS 許可設定と `useAuth.refresh()` を用いたセッション更新導線を反映済み。Rails コマンド実行には Bundler 2.3.27 が必要。
 - 2025-10-27: Bundler 2.3.27 をユーザー gem に再インストールし、`~/.zshrc` で `Gem.user_dir` を PATH に追加済み。新しいシェルでは `bundler -v` が 2.3.27 を返す。

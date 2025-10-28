@@ -12,10 +12,10 @@ docs/01_requirements.md のいいね機能と docs/04_api.md の `/api/v1/posts/
 - リクエストテスト（Rails）とフロント単体テストで成功・失敗シナリオを確認
 
 ### ゴール / 完了条件（Acceptance Criteria）
-- [ ] POST/DELETE `/api/v1/posts/:id/like` が likes テーブルを更新し、重複登録を防止する
-- [ ] タイムライン・詳細 API に `likes_count` と `is_liked` が含まれる
-- [ ] フロントのいいねボタンが API を呼び出し、成功時にカウントとハート表示が反映される
-- [ ] 未ログイン時の操作でログインダイアログまたはリダイレクトが表示される
+- [x] POST/DELETE `/api/v1/posts/:id/like` が likes テーブルを更新し、重複登録を防止する
+- [x] タイムライン・詳細 API に `likes_count` と `is_liked` が含まれる
+- [x] フロントのいいねボタンが API を呼び出し、成功時にカウントとハート表示が反映される
+- [x] 未ログイン時の操作でログインダイアログまたはリダイレクトが表示される
 
 ### テスト観点
 - リクエスト（いいね API） / 結合（フロント）
