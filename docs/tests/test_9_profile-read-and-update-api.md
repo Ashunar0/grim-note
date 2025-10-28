@@ -71,7 +71,7 @@ bin/rails test test/models/user_test.rb
 
 | 実施日     | 担当 | 結果 | メモ |
 | ---------- | ---- | ---- | ---- |
-| YYYY/MM/DD |      | ✅/❌ |      |
+| 2025/10/28 | codex | ✅ | `bundle _2.3.27_ exec rails test` |
 
 ## 要確認事項（未確定・オープン）
 

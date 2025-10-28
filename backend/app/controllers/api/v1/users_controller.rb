@@ -27,10 +27,23 @@ module Api
         end
       end
 
+      def show
+        user = User.find_by(id: params[:id])
+        if user
+          render_success(data: serialize_profile(user))
+        else
+          render_error(code: "NOT_FOUND", message: "ユーザーが見つかりません", status: :not_found)
+        end
+      end
+
       private
 
       def user_params
         params.permit(:name, :email, :password)
+      end
+
+      def serialize_profile(user)
+        UserProfileSerializer.new(user: user, viewer: current_user).as_json
       end
     end
   end
