@@ -155,7 +155,7 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
                 </Button>
 
                 <Button variant="ghost" size="sm" asChild>
-                  <Link href="/contact">
+                  <Link href={`/contact?postId=${post.id}`}>
                     <Flag className="mr-2 h-4 w-4" />
                     通報
                   </Link>
