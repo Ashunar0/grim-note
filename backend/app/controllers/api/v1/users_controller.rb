@@ -1,6 +1,8 @@
 module Api
   module V1
     class UsersController < ApplicationController
+      before_action :authenticate_user!, only: [:show]
+
       def create
         attributes = user_params.to_h
         user = User.new(attributes.slice("name", "email"))

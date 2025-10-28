@@ -45,17 +45,17 @@ class Api::V1::UsersProfileTest < ActionDispatch::IntegrationTest
     assert_equal newer_post.book.title, posts_payload.first.dig("book", "title")
   end
 
-  test "未ログインではフォローフラグが false になる" do
+  test "未ログインではプロフィール取得に失敗する" do
     get api_v1_user_path(@alice), **@json_headers
 
-    assert_response :success
+    assert_response :unauthorized
     json = response.parsed_body
-    data = json["data"]
-    refute data["is_following"]
-    refute data["is_self"]
+    assert_equal "UNAUTHORIZED", json.dig("error", "code")
+    assert_equal "ログインが必要です", json.dig("error", "message")
   end
 
   test "存在しないユーザーは 404 を返す" do
+    login_as(@alice)
     get api_v1_user_path(-999), **@json_headers
 
     assert_response :not_found
@@ -87,6 +87,20 @@ class Api::V1::UsersProfileTest < ActionDispatch::IntegrationTest
     patch api_v1_profile_path,
           params: {
             bio: "a" * 200
+          },
+          **@json_headers
+
+    assert_response :unprocessable_entity
+    json = response.parsed_body
+    assert_equal "VALIDATION_ERROR", json.dig("error", "code")
+  end
+
+  test "プロフィール更新時に不正なアイコンURLは 422 を返す" do
+    login_as(@alice)
+
+    patch api_v1_profile_path,
+          params: {
+            icon_url: "ftp://example.com/icon.png"
           },
           **@json_headers
 
