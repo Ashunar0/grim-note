@@ -43,6 +43,7 @@ class Api::V1::UsersProfileTest < ActionDispatch::IntegrationTest
     assert_equal newer_post.id, posts_payload.first["id"]
     assert_equal older_post.id, posts_payload.second["id"]
     assert_equal newer_post.book.title, posts_payload.first.dig("book", "title")
+    assert_equal false, posts_payload.first["is_liked"]
   end
 
   test "未ログインではプロフィール取得に失敗する" do

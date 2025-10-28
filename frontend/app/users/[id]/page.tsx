@@ -95,7 +95,7 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
                 userAvatar={profile.icon_url ?? undefined}
                 userId={profile.id.toString()}
                 likes={post.likes_count}
-                isLiked={false}
+                isLiked={post.is_liked}
                 createdAt={post.created_at}
               />
             ))

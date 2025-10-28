@@ -20,6 +20,8 @@ interface PostCardProps {
   likes: number;
   isLiked?: boolean;
   createdAt?: string;
+  onToggleLike?: () => void;
+  likeDisabled?: boolean;
 }
 
 export default function PostCard({
@@ -35,6 +37,8 @@ export default function PostCard({
   likes,
   isLiked = false,
   createdAt,
+  onToggleLike,
+  likeDisabled = false,
 }: PostCardProps) {
   return (
     <Card className="overflow-hidden transition-shadow hover:shadow-md">
@@ -96,6 +100,9 @@ export default function PostCard({
           variant="ghost"
           size="sm"
           className={isLiked ? "text-red-500" : ""}
+          onClick={onToggleLike}
+          disabled={likeDisabled || !onToggleLike}
+          aria-pressed={isLiked}
         >
           <Heart className={`mr-1 h-4 w-4 ${isLiked ? "fill-current" : ""}`} />
           {likes}

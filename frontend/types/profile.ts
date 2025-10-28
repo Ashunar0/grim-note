@@ -7,6 +7,7 @@ export type ProfilePost = {
   read_at: string | null;
   created_at: string;
   likes_count: number;
+  is_liked: boolean;
   book: PostBook | null;
   tags: PostTag[];
 };

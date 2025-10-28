@@ -1,8 +1,9 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { http, HttpResponse } from "msw";
 import { SWRConfig } from "swr";
 import { afterEach, beforeEach, describe, expect, it } from "vitest";
-import { resetNextNavigationMocks, setMockPathname } from "@/test/mocks/next-navigation";
+import { pushMock, resetNextNavigationMocks, setMockPathname } from "@/test/mocks/next-navigation";
 import { resetAuthMocks } from "@/test/mocks/use-auth";
 import PostDetailPage from "@/app/posts/[id]/page";
 import { server } from "@/test/server";
@@ -16,6 +17,7 @@ const buildPost = (overrides: Partial<import("@/types/posts").Post> = {}) => ({
   read_at: "2024-01-10T00:00:00.000Z",
   created_at: "2024-01-15T12:00:00.000Z",
   likes_count: 8,
+  is_liked: false,
   user: { id: 200, name: "Bob" },
   book: {
     id: 300,
@@ -100,5 +102,87 @@ describe("PostDetailPage", () => {
     await renderWithSWR(<PostDetailPage params={{ id: "42" }} />);
 
     expect(await screen.findByText("投稿取得でエラーが発生しました")).toBeInTheDocument();
+  });
+
+  it("いいねボタンをトグルできる", async () => {
+    let liked = false;
+    let likesCount = 5;
+
+    server.use(
+      http.get(`${API_BASE_URL}/posts/:id`, () =>
+        HttpResponse.json(
+          {
+            status: "success",
+            data: buildPost({ id: 42, likes_count: likesCount, is_liked: liked }),
+          },
+          { status: 200 },
+        ),
+      ),
+      http.post(`${API_BASE_URL}/posts/:id/like`, () => {
+        liked = true;
+        likesCount += 1;
+        return HttpResponse.json(
+          {
+            status: "success",
+            data: buildPost({ id: 42, likes_count: likesCount, is_liked: liked }),
+          },
+          { status: 201 },
+        );
+      }),
+      http.delete(`${API_BASE_URL}/posts/:id/like`, () => {
+        liked = false;
+        likesCount -= 1;
+        return HttpResponse.json(
+          {
+            status: "success",
+            data: buildPost({ id: 42, likes_count: likesCount, is_liked: liked }),
+          },
+          { status: 200 },
+        );
+      }),
+    );
+
+    const user = userEvent.setup();
+    await renderWithSWR(<PostDetailPage params={{ id: "42" }} />);
+
+    const likeButton = await screen.findByRole("button", { name: "5" });
+    await user.click(likeButton);
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "6" })).toHaveClass("text-red-500");
+    });
+
+    await user.click(screen.getByRole("button", { name: "6" }));
+
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "5" })).not.toHaveClass("text-red-500");
+    });
+  });
+
+  it("いいね API が 401 を返した場合にログインへ誘導される", async () => {
+    const post = buildPost({ likes_count: 2, is_liked: false });
+    server.use(
+      http.get(`${API_BASE_URL}/posts/:id`, () =>
+        HttpResponse.json({ status: "success", data: post }, { status: 200 }),
+      ),
+      http.post(`${API_BASE_URL}/posts/:id/like`, () =>
+        HttpResponse.json(
+          {
+            status: "error",
+            error: { code: "UNAUTHORIZED", message: "ログインが必要です" },
+          },
+          { status: 401 },
+        ),
+      ),
+    );
+
+    const user = userEvent.setup();
+    await renderWithSWR(<PostDetailPage params={{ id: "42" }} />);
+
+    await user.click(await screen.findByRole("button", { name: "2" }));
+
+    await waitFor(() => {
+      expect(pushMock).toHaveBeenCalledWith("/login");
+    });
   });
 });

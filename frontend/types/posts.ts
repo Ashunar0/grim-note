@@ -22,6 +22,7 @@ export type Post = {
   read_at: string | null;
   created_at: string;
   likes_count: number;
+  is_liked: boolean;
   user: PostUser;
   book: PostBook | null;
   tags: PostTag[];

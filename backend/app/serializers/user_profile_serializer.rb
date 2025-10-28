@@ -1,3 +1,5 @@
+require "set"
+
 class UserProfileSerializer
   def initialize(user:, viewer:)
     @user = user
@@ -25,37 +27,27 @@ class UserProfileSerializer
 
   def serialized_posts
     posts.map do |post|
-      {
-        id: post.id,
-        body: post.body,
-        rating: post.rating,
-        read_at: post.read_at,
-        created_at: post.created_at,
-        likes_count: post.likes_count,
-        book: serialize_book(post.book),
-        tags: post.tags.map { |tag| { id: tag.id, name: tag.name } }
-      }
+      PostSerializer.new(
+        post: post,
+        current_user: viewer,
+        liked_post_ids: liked_post_ids
+      ).as_json
     end
   end
 
-  def serialize_book(book)
-    return unless book
-
-    {
-      id: book.id,
-      title: book.title,
-      authors: book.authors,
-      published_year: book.published_year
-    }
+  def posts
+    @posts ||= user.posts.with_like_stats.order(created_at: :desc)
   end
 
-  def posts
-    @posts ||= user.posts
-                   .includes(:book, :tags)
-                   .left_outer_joins(:likes)
-                   .select("posts.*, COUNT(DISTINCT likes.id) AS likes_count")
-                   .group("posts.id")
-                   .order(created_at: :desc)
+  def liked_post_ids
+    return @liked_post_ids if defined?(@liked_post_ids)
+
+    @liked_post_ids =
+      if viewer
+        viewer.likes.where(post_id: posts.map(&:id)).pluck(:post_id).to_set
+      else
+        Set.new
+      end
   end
 
   def follower_count

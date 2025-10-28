@@ -1,6 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Heart, User, Flag, BookOpen } from "lucide-react";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -11,6 +13,9 @@ import RatingStars from "@/components/RatingStars";
 import RequireAuth from "@/components/RequireAuth";
 import { usePostDetail } from "@/hooks/use-post-detail";
 import { formatDateTime } from "@/lib/date";
+import { apiClient } from "@/lib/api-client";
+import type { ApiClientError } from "@/types/api";
+import { useAuth } from "@/hooks/use-auth";
 
 type PostDetailPageProps = {
   params: {
@@ -19,12 +24,41 @@ type PostDetailPageProps = {
 };
 
 export default function PostDetailPage({ params }: PostDetailPageProps) {
-  const { post, error, isLoading } = usePostDetail(params.id);
+  const router = useRouter();
+  const { user } = useAuth();
+  const [isLiking, setIsLiking] = useState(false);
+  const { post, error, isLoading, mutate } = usePostDetail(params.id);
   const isNotFound = error?.status === 404;
   const errorMessage =
     error && !isNotFound
       ? error.data?.error?.message ?? "投稿の取得に失敗しました"
       : null;
+
+  const handleToggleLike = async () => {
+    if (!post) return;
+    if (!user) {
+      router.push("/login");
+      return;
+    }
+
+    setIsLiking(true);
+
+    try {
+      if (post.is_liked) {
+        await apiClient.delete(`/posts/${post.id}/like`);
+      } else {
+        await apiClient.post(`/posts/${post.id}/like`);
+      }
+      await mutate();
+    } catch (err) {
+      const apiError = err as ApiClientError;
+      if (apiError.status === 401) {
+        router.push("/login");
+      }
+    } finally {
+      setIsLiking(false);
+    }
+  };
 
   return (
     <RequireAuth>
@@ -108,8 +142,15 @@ export default function PostDetailPage({ params }: PostDetailPageProps) {
               <Separator />
 
               <div className="flex items-center justify-between">
-                <Button variant="ghost" size="lg">
-                  <Heart className="mr-2 h-5 w-5" />
+                <Button
+                  variant="ghost"
+                  size="lg"
+                  className={post.is_liked ? "text-red-500" : ""}
+                  onClick={handleToggleLike}
+                  disabled={isLiking}
+                  aria-pressed={post.is_liked}
+                >
+                  <Heart className={`mr-2 h-5 w-5 ${post.is_liked ? "fill-current" : ""}`} />
                   {post.likes_count}
                 </Button>
 
