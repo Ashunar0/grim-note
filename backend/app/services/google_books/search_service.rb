@@ -1,6 +1,7 @@
 require "uri"
 require "net/http"
 require "json"
+require "open-uri"
 
 module GoogleBooks
   class SearchService
@@ -22,12 +23,12 @@ module GoogleBooks
     end
 
     def call
-      response = perform_request
-      unless response.is_a?(Net::HTTPSuccess)
-        raise Error, "Google Books API responded with #{response.code}"
+      body_text, status = fetch_response_body
+      unless status.to_i == 200
+        raise Error, "Google Books API responded with #{status}"
       end
 
-      body = JSON.parse(response.body)
+      body = JSON.parse(body_text)
       items = Array(body["items"])
       items.map { |item| normalize_item(item) }
     rescue JSON::ParserError => e
@@ -38,20 +39,64 @@ module GoogleBooks
 
     private
 
-    def perform_request
+    def fetch_response_body
       uri = build_uri
+      Rails.logger.info("[GoogleBooks] env=#{Rails.env}")
+      if Rails.env.development?
+        fetch_with_open_uri(uri)
+      else
+        response = perform_http_request(uri)
+        [response.body, response.code]
+      end
+    rescue OpenSSL::SSL::SSLError => e
+      Rails.logger.warn("[GoogleBooks] SSL error #{e.class}: #{e.message}. Retrying with open-uri.")
+      fetch_with_open_uri(uri)
+    end
+
+    def fetch_with_open_uri(uri)
+      Rails.logger.info("[GoogleBooks] fetching via open-uri")
+      io = URI.open(uri, ssl_verify_mode: OpenSSL::SSL::VERIFY_NONE)
+      [io.read, 200]
+    rescue OpenURI::HTTPError => e
+      Rails.logger.info("[GoogleBooks] open-uri error: #{e.message}")
+      [e.io.read, Array(e.io.status).first]
+    end
+
+    def perform_http_request(uri)
       request = Net::HTTP::Get.new(uri)
 
-      Net::HTTP.start(
-        uri.host,
-        uri.port,
-        use_ssl: uri.scheme == "https",
-        open_timeout: OPEN_TIMEOUT_SECONDS,
-        read_timeout: READ_TIMEOUT_SECONDS
-      ) do |http|
-        http.request(request)
+      http = Net::HTTP.new(uri.host, uri.port)
+      http.use_ssl = uri.scheme == "https"
+      http.open_timeout = OPEN_TIMEOUT_SECONDS
+      http.read_timeout = READ_TIMEOUT_SECONDS
+      configure_ssl!(http)
+
+      http.start do |client|
+        client.request(request)
       end
     end
+
+    def configure_ssl!(http)
+      return unless http.use_ssl?
+
+      Rails.logger.info("[GoogleBooks] configuring SSL...")
+      context = http.instance_variable_get(:@ssl_context) || OpenSSL::SSL::SSLContext.new
+
+      if Rails.env.development?
+        context.verify_mode = OpenSSL::SSL::VERIFY_NONE
+        context.verify_hostname = false
+        context.verify_flags = 0 if context.respond_to?(:verify_flags=)
+        Rails.logger.info("[GoogleBooks] SSL verify_mode=VERIFY_NONE (development)")
+      else
+        context.verify_mode = OpenSSL::SSL::VERIFY_PEER
+        context.verify_hostname = true
+        context.verify_flags = 0 if context.respond_to?(:verify_flags=)
+        Rails.logger.info("[GoogleBooks] SSL verify_mode=VERIFY_PEER")
+      end
+
+      http.instance_variable_set(:@ssl_context, context)
+    end
+    
 
     def build_uri
       uri = GOOGLE_BOOKS_ENDPOINT.dup
