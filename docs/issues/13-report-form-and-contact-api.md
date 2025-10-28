@@ -5,11 +5,11 @@ docs/01_requirements.md で定義された通報フォームを `/contact` ペ�
 - ラベル: backend, frontend, external
 
 ### スコープ / 作業項目
-- `POST /api/v1/reports` のコントローラ実装（Slack Webhook または Google Form 連携処理を含む）
-- バリデーション（post_id 任意? category 必須?）や rate limiting の検討
-- `frontend/app/contact/page.tsx` から API を呼び出し、送信中インジケータ・完了メッセージ・エラー表示を実装
-- 投稿詳細ページの通報ボタンから `/contact?postId=xxx` で遷移し、自動入力する処理を実装
-- 連携先ごとの設定手順と環境変数記述を docs/02_architecture.md か README/AGENTS に追記
+- [x] `POST /api/v1/reports` のコントローラ実装（Slack Webhook または Google Form 連携処理を含む）
+- [x] バリデーション（post_id 任意? category 必須?）や rate limiting の検討
+- [x] `frontend/app/contact/page.tsx` から API を呼び出し、送信中インジケータ・完了メッセージ・エラー表示を実装
+- [x] 投稿詳細ページの通報ボタンから `/contact?postId=xxx` で遷移し、自動入力する処理を実装
+- [x] 連携先ごとの設定手順と環境変数記述を docs/02_architecture.md か README/AGENTS に追記
 
 ### ゴール / 完了条件（Acceptance Criteria）
 - [ ] POST `/api/v1/reports` が post_id・category・message を受け取り、Slack Webhook もしくは Google Form に連携する

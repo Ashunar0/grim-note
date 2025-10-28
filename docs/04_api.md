@@ -447,7 +447,7 @@ curl -X POST https://yomuplus.app/api/v1/posts \
 ### POST /api/v1/reports
 
 **認証**: 不要
-**説明**: 不適切な投稿を報告（MVP では Slack または Google Form へ転送）
+**説明**: 不適切な投稿・お問い合わせ内容を受け付け、Slack Webhook に転送
 
 #### リクエスト例
 
@@ -456,7 +456,9 @@ curl -X POST https://yomuplus.app/api/v1/reports \
   -H "Content-Type: application/json" \
   -d '{
     "post_id": 123,
-    "reason": "不適切な表現が含まれています"
+    "category": "report",
+    "message": "不適切な表現が含まれています",
+    "email": "reporter@example.com"
   }'
 ```
 
@@ -465,9 +467,16 @@ curl -X POST https://yomuplus.app/api/v1/reports \
 ```json
 {
   "status": "success",
-  "message": "報告を受け付けました"
+  "data": {
+    "message": "報告を受け付けました"
+  }
 }
 ```
+
+**エラー**:
+
+- `VALIDATION_ERROR` 必須項目不足・カテゴリ不正・存在しない投稿 ID を指定した
+- `SERVER_ERROR` Webhook 連携に失敗した
 
 ---
 

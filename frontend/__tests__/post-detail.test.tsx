@@ -65,6 +65,8 @@ describe("PostDetailPage", () => {
     expect(screen.getByText("文学")).toBeInTheDocument();
     expect(screen.getByText("ファンタジー")).toBeInTheDocument();
     expect(screen.getByText("8")).toBeInTheDocument();
+    const reportLink = screen.getByRole("link", { name: "通報" });
+    expect(reportLink).toHaveAttribute("href", "/contact?postId=42");
   });
 
   it("404 応答で未発見メッセージを表示する (TEST-05-06)", async () => {
