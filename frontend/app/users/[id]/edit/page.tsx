@@ -67,7 +67,7 @@ export default function EditProfilePage({ params }: EditProfilePageProps) {
       await apiClient.patch<ApiSuccess<Profile>>("/profile", {
         name: userName.trim(),
         bio: bio.trim(),
-        icon_url: avatar.trim(),
+        icon_url: avatar.trim() === "" ? null : avatar.trim(),
       });
       await mutate();
       await refresh();
@@ -127,7 +127,7 @@ export default function EditProfilePage({ params }: EditProfilePageProps) {
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="flex flex-col items-center space-y-4">
               <Avatar className="h-24 w-24">
-                <AvatarImage src={avatar} alt={userName} />
+                <AvatarImage src={avatar || undefined} alt={userName} />
                 <AvatarFallback>
                   <User className="h-12 w-12" />
                 </AvatarFallback>

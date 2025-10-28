@@ -86,8 +86,8 @@ export default function UserProfilePage({ params }: UserProfilePageProps) {
               <PostCard
                 key={post.id}
                 id={post.id.toString()}
-                bookTitle={post.book?.title ?? "書籍情報なし"}
-                author={post.book?.authors ?? "著者情報なし"}
+                bookTitle={post.book?.title ?? undefined}
+                author={post.book?.authors ?? undefined}
                 content={post.body}
                 rating={post.rating}
                 tags={post.tags.map((tag) => tag.name)}
