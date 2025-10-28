@@ -72,7 +72,7 @@ npm run test:e2e    # 通報導線の E2E
 
 | 実施日     | 担当 | 結果 | メモ |
 | ---------- | ---- | ---- | ---- |
-| YYYY/MM/DD |      | ✅/❌ |      |
+| 2025/10/28 | a.kawanobe | ✅ | `bundle _2.3.27_ exec rails test TEST=test/requests/api/v1/reports_test.rb` / `npm run lint` / `npm run typecheck` / `npm run test -- --run` |
 
 ## 要確認事項（未確定・オープン）
 

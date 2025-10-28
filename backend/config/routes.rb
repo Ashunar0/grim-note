@@ -9,6 +9,7 @@ Rails.application.routes.draw do
       resources :posts, only: [:index, :show, :create] do
         resource :like, only: [:create, :destroy], controller: "post_likes"
       end
+      resources :reports, only: [:create]
       post "login", to: "sessions#create"
       delete "logout", to: "sessions#destroy"
       get "me", to: "current_users#show"
