@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -9,19 +9,113 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { User, Upload } from "lucide-react";
+import { useProfile } from "@/hooks/use-profile";
+import { apiClient } from "@/lib/api-client";
+import type { ApiClientError, ApiSuccess } from "@/types/api";
+import type { Profile } from "@/types/profile";
+import { useAuth } from "@/hooks/use-auth";
 
-export default function EditProfilePage({ params }: { params: { id: string } }) {
+const MAX_BIO_LENGTH = 160;
+
+type EditProfilePageProps = {
+  params: { id: string };
+};
+
+export default function EditProfilePage({ params }: EditProfilePageProps) {
   const router = useRouter();
-  const [userName, setUserName] = useState("読書太郎");
-  const [bio, setBio] = useState(
-    "本が好きで毎日読書をしています。特に日本文学と海外ミステリーが好きです。"
-  );
-  const [avatar, setAvatar] = useState("");
+  const { refresh } = useAuth();
+  const userId = Number(params.id);
+  const numericOrStringId = Number.isNaN(userId) ? params.id : userId;
+  const { profile, isLoading, error, mutate } = useProfile(numericOrStringId);
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    router.push(`/users/${params.id}`);
+  const [userName, setUserName] = useState("");
+  const [bio, setBio] = useState("");
+  const [avatar, setAvatar] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const initializedRef = useRef(false);
+
+  useEffect(() => {
+    if (!isLoading && error?.status === 401) {
+      router.replace("/login");
+    }
+  }, [error, isLoading, router]);
+
+  useEffect(() => {
+    if (!isLoading && profile && !profile.is_self) {
+      router.replace(`/users/${profile.id}`);
+    }
+  }, [profile, isLoading, router]);
+
+  useEffect(() => {
+    if (profile && profile.is_self && !initializedRef.current) {
+      setUserName(profile.name);
+      setBio(profile.bio ?? "");
+      setAvatar(profile.icon_url ?? "");
+      initializedRef.current = true;
+    }
+  }, [profile]);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    if (!profile) return;
+
+    setIsSubmitting(true);
+    setSubmitError(null);
+
+    try {
+      await apiClient.patch<ApiSuccess<Profile>>("/profile", {
+        name: userName.trim(),
+        bio: bio.trim(),
+        icon_url: avatar.trim(),
+      });
+      await mutate();
+      await refresh();
+      router.push(`/users/${profile.id}`);
+      router.refresh();
+    } catch (err) {
+      const apiError = err as ApiClientError;
+      const message =
+        apiError.data?.error?.message ?? "プロフィールの更新に失敗しました";
+      setSubmitError(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto max-w-3xl px-4 py-6">
+        <div className="py-12 text-center text-muted-foreground">
+          読み込み中です...
+        </div>
+      </div>
+    );
+  }
+
+  if (error && error.status !== 401) {
+    const message =
+      error.data?.error?.message ?? "プロフィールの取得に失敗しました";
+    return (
+      <div className="container mx-auto max-w-3xl px-4 py-6">
+        <div className="py-12 text-center text-destructive">{message}</div>
+      </div>
+    );
+  }
+
+  if (!profile || !profile.is_self) {
+    return null;
+  }
+
+  if (!initializedRef.current) {
+    return (
+      <div className="container mx-auto max-w-3xl px-4 py-6">
+        <div className="py-12 text-center text-muted-foreground">
+          読み込み中です...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="container mx-auto max-w-3xl px-4 py-6">
@@ -50,6 +144,7 @@ export default function EditProfilePage({ params }: { params: { id: string } }) 
                 id="userName"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
+                maxLength={50}
                 required
               />
             </div>
@@ -62,21 +157,36 @@ export default function EditProfilePage({ params }: { params: { id: string } }) 
                 value={bio}
                 onChange={(e) => setBio(e.target.value)}
                 rows={5}
-                maxLength={200}
+                maxLength={MAX_BIO_LENGTH}
               />
-              <p className="text-xs text-muted-foreground text-right">
-                {bio.length} / 200
+              <p className="text-right text-xs text-muted-foreground">
+                {bio.length} / {MAX_BIO_LENGTH}
               </p>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="avatarUrl">アイコン URL</Label>
+              <Input
+                id="avatarUrl"
+                placeholder="https://example.com/avatar.png"
+                value={avatar}
+                onChange={(e) => setAvatar(e.target.value)}
+              />
+            </div>
+
+            {submitError && (
+              <p className="text-sm text-destructive">{submitError}</p>
+            )}
+
             <div className="flex space-x-3">
-              <Button type="submit" className="flex-1">
-                保存
+              <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                {isSubmitting ? "保存中..." : "保存"}
               </Button>
               <Button
                 type="button"
                 variant="outline"
-                onClick={() => router.back()}
+                onClick={() => router.push(`/users/${profile.id}`)}
+                disabled={isSubmitting}
               >
                 キャンセル
               </Button>
