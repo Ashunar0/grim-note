@@ -174,7 +174,6 @@ describe("UserProfilePage", () => {
     ).not.toBeInTheDocument();
   });
 });
-
 describe("EditProfilePage", () => {
   beforeEach(() => {
     setMockPathname("/users/1/edit");
@@ -225,6 +224,7 @@ describe("EditProfilePage", () => {
     });
     expect(refreshAuthMock).toHaveBeenCalled();
   });
+});
 
   it("本人以外がアクセスするとプロフィールへリダイレクト (TEST-10-06)", async () => {
     const profile = buildProfile({ id: 2, is_self: false });
@@ -290,71 +290,6 @@ describe("EditProfilePage", () => {
     expect(await screen.findByText("アイコンURLが不正です")).toBeInTheDocument();
   });
 
-  it("アイコンURLを空にして送信するとフォールバックに戻る", async () => {
-    let profile = buildProfile();
-
-    server.use(
-      http.get(`${API_BASE_URL}/users/1`, () =>
-        HttpResponse.json({ status: "success", data: profile }, { status: 200 }),
-      ),
-      http.patch(`${API_BASE_URL}/profile`, async ({ request }) => {
-        const body = (await request.json()) as Record<string, unknown>;
-        expect(body.icon_url).toBeNull();
-        profile = buildProfile({ icon_url: null });
-        return HttpResponse.json(
-          { status: "success", data: profile },
-          { status: 200 },
-        );
-      }),
-    );
-
-    await renderWithSWR(<EditProfilePage params={{ id: "1" }} />);
-
-    const avatarInput = await screen.findByLabelText("アイコン URL");
-    const user = userEvent.setup();
-    await user.clear(avatarInput);
-
-    await user.click(screen.getByRole("button", { name: "保存" }));
-
-    await waitFor(() => {
-      expect(pushMock).toHaveBeenCalledWith("/users/1");
-    });
-    expect(refreshAuthMock).toHaveBeenCalled();
-  });
-});
-  it("書籍情報が無い投稿はタイトル/著者を非表示にする", async () => {
-    const profile = buildProfile({
-      posts: [
-        {
-          id: 11,
-          body: "素晴らしい本でした",
-          rating: 4,
-          read_at: "2024-01-01",
-          created_at: "2024-01-05T12:00:00.000Z",
-          likes_count: 5,
-          book: null,
-          tags: [],
-        },
-      ],
-    });
-    server.use(
-      http.get(`${API_BASE_URL}/users/3`, () =>
-        HttpResponse.json(
-          { status: "success", data: { ...profile, id: 3, post_count: 1 } },
-          { status: 200 },
-        ),
-      ),
-    );
-
-    await renderWithSWR(<UserProfilePage params={{ id: "3" }} />);
-
-    expect(
-      await screen.findByText("素晴らしい本でした"),
-    ).toBeInTheDocument();
-    expect(
-      screen.queryByRole("heading", { name: "吾輩は猫である" }),
-    ).not.toBeInTheDocument();
-  });
   it("アイコンURLを空にして送信するとフォールバックに戻る", async () => {
     let profile = buildProfile();
 
