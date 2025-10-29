@@ -61,7 +61,7 @@ export default function TimelinePage() {
               is_liked: !item.is_liked,
               likes_count: item.likes_count + (item.is_liked ? -1 : 1),
             }
-          : item,
+          : item
       );
 
     setPendingState(post.id, true);
@@ -87,20 +87,33 @@ export default function TimelinePage() {
   const renderContent = (tab: TimelineTab) => {
     const { posts, isLoading, error } = tab === "recent" ? recent : following;
     const errorMessage =
-      error?.data?.error?.message ?? (error ? "タイムラインの取得に失敗しました" : null);
+      error?.data?.error?.message ??
+      (error ? "タイムラインの取得に失敗しました" : null);
     const emptyStateMessage =
-      tab === "following" ? "フォロー中のユーザーの投稿はまだありません" : "投稿がまだありません";
+      tab === "following"
+        ? "フォロー中のユーザーの投稿はまだありません"
+        : "投稿がまだありません";
 
     if (isLoading) {
-      return <div className="py-12 text-center text-muted-foreground">読み込み中...</div>;
+      return (
+        <div className="py-12 text-center text-muted-foreground">
+          読み込み中...
+        </div>
+      );
     }
 
     if (errorMessage) {
-      return <div className="py-12 text-center text-destructive">{errorMessage}</div>;
+      return (
+        <div className="py-12 text-center text-destructive">{errorMessage}</div>
+      );
     }
 
     if (posts.length === 0) {
-      return <div className="py-12 text-center text-muted-foreground">{emptyStateMessage}</div>;
+      return (
+        <div className="py-12 text-center text-muted-foreground">
+          {emptyStateMessage}
+        </div>
+      );
     }
 
     return posts.map((post) => (
@@ -117,7 +130,9 @@ export default function TimelinePage() {
         likes={post.likes_count}
         isLiked={post.is_liked}
         createdAt={post.created_at}
-        onToggleLike={() => toggleLike(post, tab === "recent" ? recent.mutate : following.mutate)}
+        onToggleLike={() =>
+          toggleLike(post, tab === "recent" ? recent.mutate : following.mutate)
+        }
         likeDisabled={pendingLikeIds.has(post.id)}
       />
     ));
@@ -126,7 +141,11 @@ export default function TimelinePage() {
   return (
     <RequireAuth>
       <div className="container mx-auto max-w-3xl px-4 py-6">
-        <Tabs value={activeTab} onValueChange={(value) => setActiveTab(value as TimelineTab)} className="w-full">
+        <Tabs
+          value={activeTab}
+          onValueChange={(value) => setActiveTab(value as TimelineTab)}
+          className="w-full"
+        >
           <TabsList className="grid w-full grid-cols-2">
             <TabsTrigger value="recent">新着</TabsTrigger>
             <TabsTrigger value="following">フォロー中</TabsTrigger>
@@ -147,7 +166,7 @@ export default function TimelinePage() {
           asChild
         >
           <Link href="/posts/new">
-            <Plus className="h-6 w-6" />
+            <Plus className="h-6 w-6 text-primary-foreground" />
           </Link>
         </Button>
       </div>
