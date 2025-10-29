@@ -166,7 +166,7 @@ export default function TimelinePage() {
           asChild
         >
           <Link href="/posts/new">
-            <Plus className="h-6 w-6 text-primary-foreground" />
+            <Plus className="h-6 w-6 text-white" />
           </Link>
         </Button>
       </div>
