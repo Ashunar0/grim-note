@@ -4,6 +4,11 @@ require "factory_bot_rails"
 require "faker"
 require "securerandom"
 
+# 開発・テスト環境以外での誤実行を防止
+unless Rails.env.development? || Rails.env.test?
+  abort("Seeding aborted: this script is intended for development/test environments only.")
+end
+
 # Faker が日本語を返すようにロケールを指定し、ユニーク値をリセット
 Faker::Config.locale = :ja
 Faker::UniqueGenerator.clear
