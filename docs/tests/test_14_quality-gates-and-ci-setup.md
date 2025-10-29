@@ -71,7 +71,7 @@ npm run test -- --runTestsByPath src/__tests__/smoke.test.tsx
 
 | 実施日     | 担当 | 結果 | メモ |
 | ---------- | ---- | ---- | ---- |
-| YYYY/MM/DD |      | ✅/❌ |      |
+| 2025/10/29 | AI   | ✅   | `bundle _2.3.27_ exec rails test`, `bundle _2.3.27_ exec rubocop`, `npm run lint`, `npm run test -- --run` を実行し、GitHub Actions ワークフローと `./bin/check` を整備。 |
 
 ## 要確認事項（未確定・オープン）
 

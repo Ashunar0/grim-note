@@ -12,10 +12,10 @@ MVP の品質を維持するため、docs/00_codex.md の lint 期待と docs/02
 - CI 成功のスクリーンショットやログ記録を残す（PR コメントなど）
 
 ### ゴール / 完了条件（Acceptance Criteria）
-- [ ] GitHub Actions で `bin/rails test`, `bin/rubocop`, `npm run lint` を実行するワークフローが追加される
-- [ ] ローカル実行用に lint/test をまとめたスクリプトまたは make タスクが追加される
-- [ ] 主要 API とフロントのユースケースに対するテスト（Minitest リクエストテスト + smoke レベルの React テスト）が追加される
-- [ ] `AGENTS.md` もしくは README に品質チェックの手順が追記される
+- [x] GitHub Actions で `bin/rails test`, `bin/rubocop`, `npm run lint` を実行するワークフローが追加される
+- [x] ローカル実行用に lint/test をまとめたスクリプトまたは make タスクが追加される
+- [x] 主要 API とフロントのユースケースに対するテスト（Minitest リクエストテスト + smoke レベルの React テスト）が追加される
+- [x] `AGENTS.md` もしくは README に品質チェックの手順が追記される
 
 ### テスト観点
 - CI / 自動テスト

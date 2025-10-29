@@ -25,6 +25,16 @@
 - 2025-10-27: Issue #5「timeline and post detail api integration」を完了。SWR ベースの `useTimelinePosts` / `usePostDetail` を追加し、`/timeline` と `/posts/:id` が API レスポンスを用いたローディング・エラー・空表示・404 ハンドリングを行うよう更新。PostCard に投稿日表示を追加。`npm run lint` と `npm run typecheck` で検証済み。
 - 2025-10-28: Issue #12「follow feature and following timeline」対応済み。`POST/DELETE /api/v1/users/:id/follow` を実装し、タイムライン `tab=following`・プロフィールのフォローステータスを同期。`ProfileHeader` のフォローボタンとタイムラインのフォロー中タブを連携させ、`bin/rails test` と `npm run lint`, `npm run typecheck`, `npm run test -- --run` で確認。ドキュメント `docs/04_api.md` と受入テスト表 `docs/tests/test_12_follow-feature-and-following-timeline.md` を実装仕様に揃え、検証結果欄へ 2025/10/28 実行分を記録済み。
 - 2025-10-28: Issue #13「report form and contact api」対応済み。`POST /api/v1/reports` で Slack Webhook (`SLACK_REPORT_WEBHOOK_URL`) へ転送する API と `ReportForm` バリデーションを追加。`/contact` フォームから送信中インジケータ・成功/失敗メッセージを表示し、投稿詳細の通報ボタンは `?postId=` を付与。Slack Webhook URL は `.env.local` 等で設定し、未設定時は SERVER_ERROR を返す。
+- 2025-10-29: Issue #14「quality gates and ci setup」対応済み。GitHub Actions `Quality Gates` ワークフローを追加し、Rails テスト/RuboCop/Next.js lint を自動実行。ローカル統合コマンド `./bin/check` を用意し、追加のモデルテストとコンタクトページの smoke テストで品質ゲートを補強。README に品質チェック手順を追記。
+
+## ここまでの実装サマリ (2025-10-29)
+
+- Issue #6: `GoogleBooks::SearchService` を実装。API キーは `backend/.env.local` 等に保存し、開発環境では SSL の CRL 検証回避を許容。本番では証明書を正しく設定する前提。
+- Issue #7-8: 投稿作成 API/フロントを連携。`POST /api/v1/posts` は書籍 ID・タグ配列を含むレスポンスを返し、Next.js 側で書籍検索→投稿作成まで一連のフォームを実装。受入テスト `docs/tests/test_7_post-create-api-and-tag-persistence.md` に準拠。
+- Issue #9-10: プロフィール閲覧/更新 API と UI を整備。`GET /api/v1/users/:id` は認証必須に揃え、編集ページでアイコン URL の空文字を null に正規化し、書籍情報欠如時は表示を抑制。
+- Issue #11-12: いいね・フォロー機能を API/フロント双方で実装。レスポンス仕様・受入テスト (`docs/tests/test_11_like-feature-and-ui-sync.md`, `docs/tests/test_12_follow-feature-and-following-timeline.md`) を更新し、未ログイン時のフォロータイムライン 401 をリクエストテストで担保。
+- Issue #13: 通報フォームから Slack Webhook へ投稿を転送。メール必須・本文 1000 文字制限・投稿 ID バリデーションを揃え、フロントフォームに `maxLength` を設定。`.env.local` または `~/.zshrc` で `SLACK_REPORT_WEBHOOK_URL` を読み込む運用を明記。
+- Issue #14: Quality Gates を整備。GitHub Actions で Rails テスト・RuboCop・Next.js lint を実行し、ローカル用 `./bin/check` を追加。`backend/test/models/post_test.rb` と `frontend/__tests__/contact-page.test.tsx` を新設し、品質確認手順を README に追記。
 
 ## ここまでの実装サマリ (2025-10-28)
 
