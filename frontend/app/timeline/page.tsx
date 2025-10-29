@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Plus } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import PostCard from "@/components/PostCard";
 import { Button } from "@/components/ui/button";
@@ -166,7 +165,7 @@ export default function TimelinePage() {
           asChild
         >
           <Link href="/posts/new">
-            <Plus className="h-6 w-6 text-white" />
+            <span className="text-white font-bold text-2xl">＋</span>
           </Link>
         </Button>
       </div>
