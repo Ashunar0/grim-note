@@ -80,6 +80,18 @@ describe("ContactPage", () => {
     resetNextNavigationMocks();
   });
 
+  it("必須項目を表示する", async () => {
+    const ContactPage = (await import("@/app/contact/page")).default;
+
+    render(<ContactPage />);
+
+    expect(screen.getByRole("heading", { name: "お問い合わせ" })).toBeInTheDocument();
+    expect(screen.getByLabelText("お問い合わせ種別 *")).toBeInTheDocument();
+    expect(screen.getByLabelText("メールアドレス *")).toBeRequired();
+    expect(screen.getByLabelText("お問い合わせ内容 *")).toBeRequired();
+    expect(screen.getByRole("button", { name: "送信する" })).toBeInTheDocument();
+  });
+
   it("クエリの postId を自動入力する", async () => {
     setMockSearchParams({ postId: "45" });
     const ContactPage = (await import("@/app/contact/page")).default;
